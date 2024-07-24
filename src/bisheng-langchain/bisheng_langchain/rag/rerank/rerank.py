@@ -20,9 +20,9 @@ class CustomReranker:
         with torch.no_grad():
             inputs = self.tokenizer(pairs, padding=True, truncation=True, return_tensors='pt', max_length=512).to(self.device_id)
             scores = self.rank_model(**inputs, return_dict=True).logits.view(-1, ).float()
-            scores = torch.sigmoid(scores) 
+            scores = torch.sigmoid(scores)
             scores = scores.cpu().numpy()
-            
+
         return scores[0]
 
     def sort_and_filter(self, query, all_chunks):

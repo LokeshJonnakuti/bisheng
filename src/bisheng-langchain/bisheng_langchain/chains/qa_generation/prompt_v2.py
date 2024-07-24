@@ -1,9 +1,5 @@
-from langchain_core.prompts.chat import (
-    ChatPromptTemplate,
-    HumanMessagePromptTemplate,
-    SystemMessagePromptTemplate,
-)
-
+from langchain_core.prompts.chat import (ChatPromptTemplate, HumanMessagePromptTemplate,
+                                         SystemMessagePromptTemplate)
 
 SEED_QUESTION_SYSTEM = SystemMessagePromptTemplate.from_template(
     """\
@@ -121,7 +117,7 @@ question: What did the study mention?
 
 question: What is the focus of the REPLUG paper?
 {{
-    "reason": "The question refers to a specific work by it's name hence can be understood", 
+    "reason": "The question refers to a specific work by it's name hence can be understood",
     "verdict": "Yes"
 }}
 """  # noqa: E501
@@ -145,7 +141,7 @@ FILTER_QUESTION_CHAT_PROMPT = ChatPromptTemplate.from_messages(
 
 ANSWER_FORMULATE = HumanMessagePromptTemplate.from_template(
     """\
-Answer the question using the information from the given context. 
+Answer the question using the information from the given context.
 
 context:{context}
 

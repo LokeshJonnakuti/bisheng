@@ -4,13 +4,13 @@ import json
 import logging
 import re
 from typing import Optional, Union
-from pydantic import Field
 
 from langchain.agents.agent import AgentOutputParser
 from langchain.agents.structured_chat.prompt import FORMAT_INSTRUCTIONS
 from langchain.output_parsers import OutputFixingParser
 from langchain.schema import AgentAction, AgentFinish, OutputParserException
 from langchain.schema.language_model import BaseLanguageModel
+from pydantic import Field
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 class StructuredChatOutputParser(AgentOutputParser):
     """Output parser for the structured chat agent."""
 
-    pattern = re.compile(r"```(?:json)?\n(.*?)```", re.DOTALL)
+    pattern = re.compile(r'```(?:json)?\n(.*?)```', re.DOTALL)
 
     def get_format_instructions(self) -> str:
         return FORMAT_INSTRUCTIONS
@@ -30,22 +30,22 @@ class StructuredChatOutputParser(AgentOutputParser):
                 response = json.loads(action_match.group(1).strip(), strict=False)
                 if isinstance(response, list):
                     # gpt turbo frequently ignores the directive to emit a single action
-                    logger.warning("Got multiple action responses: %s", response)
+                    logger.warning('Got multiple action responses: %s', response)
                     response = response[0]
-                if response["action"] == "Final Answer":
-                    return AgentFinish({"output": response["action_input"]}, text)
+                if response['action'] == 'Final Answer':
+                    return AgentFinish({'output': response['action_input']}, text)
                 else:
                     return AgentAction(
-                        response["action"], response.get("action_input", {}), text
+                        response['action'], response.get('action_input', {}), text
                     )
             else:
-                return AgentFinish({"output": text}, text)
+                return AgentFinish({'output': text}, text)
         except Exception as e:
             raise OutputParserException(f"Could not parse LLM output: {text}") from e
 
     @property
     def _type(self) -> str:
-        return "structured_chat"
+        return 'structured_chat'
 
 
 class StructuredChatOutputParserWithRetries(AgentOutputParser):
@@ -90,4 +90,4 @@ class StructuredChatOutputParserWithRetries(AgentOutputParser):
 
     @property
     def _type(self) -> str:
-        return "structured_chat_with_retries"
+        return 'structured_chat_with_retries'

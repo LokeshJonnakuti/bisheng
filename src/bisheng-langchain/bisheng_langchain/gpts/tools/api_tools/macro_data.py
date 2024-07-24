@@ -254,48 +254,48 @@ class MacroData(BaseModel):
         """中国 PMI （采购经理人指数）月度统计数据。
         返回数据包括：月份制造业 PMI，制造业 PMI 同比增长，非制造业 PMI，非制造业 PMI 同比增长。
         """
-        url = "https://datacenter-web.eastmoney.com/api/data/v1/get"
+        url = 'https://datacenter-web.eastmoney.com/api/data/v1/get'
         params = {
-            "columns": "REPORT_DATE,TIME,MAKE_INDEX,MAKE_SAME,NMAKE_INDEX,NMAKE_SAME",
-            "pageNumber": "1",
-            "pageSize": "2000",
-            "sortColumns": "REPORT_DATE",
-            "sortTypes": "-1",
-            "source": "WEB",
-            "client": "WEB",
-            "reportName": "RPT_ECONOMY_PMI",
-            "p": "1",
-            "pageNo": "1",
-            "pageNum": "1",
-            "_": "1669047266881",
+            'columns': 'REPORT_DATE,TIME,MAKE_INDEX,MAKE_SAME,NMAKE_INDEX,NMAKE_SAME',
+            'pageNumber': '1',
+            'pageSize': '2000',
+            'sortColumns': 'REPORT_DATE',
+            'sortTypes': '-1',
+            'source': 'WEB',
+            'client': 'WEB',
+            'reportName': 'RPT_ECONOMY_PMI',
+            'p': '1',
+            'pageNo': '1',
+            'pageNum': '1',
+            '_': '1669047266881',
         }
         r = requests.get(url, params=params, timeout=60)
         data_json = r.json()
-        temp_df = pd.DataFrame(data_json["result"]["data"])
+        temp_df = pd.DataFrame(data_json['result']['data'])
         temp_df.columns = [
-            "-",
-            "月份",
-            "制造业-指数",
-            "制造业-同比增长",
-            "非制造业-指数",
-            "非制造业-同比增长",
+            '-',
+            '月份',
+            '制造业-指数',
+            '制造业-同比增长',
+            '非制造业-指数',
+            '非制造业-同比增长',
         ]
         temp_df = temp_df[
             [
-                "月份",
-                "制造业-指数",
-                "制造业-同比增长",
-                "非制造业-指数",
-                "非制造业-同比增长",
+                '月份',
+                '制造业-指数',
+                '制造业-同比增长',
+                '非制造业-指数',
+                '非制造业-同比增长',
             ]
         ]
-        temp_df["制造业-指数"] = pd.to_numeric(temp_df["制造业-指数"], errors="coerce")
-        temp_df["制造业-同比增长"] = pd.to_numeric(
-            temp_df["制造业-同比增长"], errors="coerce"
+        temp_df['制造业-指数'] = pd.to_numeric(temp_df['制造业-指数'], errors='coerce')
+        temp_df['制造业-同比增长'] = pd.to_numeric(
+            temp_df['制造业-同比增长'], errors='coerce'
         )
-        temp_df["非制造业-指数"] = pd.to_numeric(temp_df["非制造业-指数"], errors="coerce")
-        temp_df["非制造业-同比增长"] = pd.to_numeric(
-            temp_df["非制造业-同比增长"], errors="coerce"
+        temp_df['非制造业-指数'] = pd.to_numeric(temp_df['非制造业-指数'], errors='coerce')
+        temp_df['非制造业-同比增长'] = pd.to_numeric(
+            temp_df['非制造业-同比增长'], errors='coerce'
         )
         if start_date and end_date:
             start = start_date.split('-')[0] + '年' + start_date.split('-')[1] + '月份'
@@ -431,55 +431,55 @@ M0数量（单位：亿元），M0 同比（单位：%），M0 环比（单位�
         return temp_df.to_markdown()
 
     @classmethod
-    def bond_zh_us_rate(cls, start_date: str = "", end_date: str = "") -> str:
+    def bond_zh_us_rate(cls, start_date: str = '', end_date: str = '') -> str:
         """
         本接口返回指定时间段[start_date,end_date]内交易日的中美两国的 2 年、5 年、10 年、30 年、10 年-2 年收益率数据。
         start_date表示起始日期，end_date表示结束日期，日期格式例如 2024-04-07
         """
-        url = "https://datacenter.eastmoney.com/api/data/get"
+        url = 'https://datacenter.eastmoney.com/api/data/get'
         params = {
-            "type": "RPTA_WEB_TREASURYYIELD",
-            "sty": "ALL",
-            "st": "SOLAR_DATE",
-            "sr": "-1",
-            "token": "894050c76af8597a853f5b408b759f5d",
-            "p": "1",
-            "ps": "500",
-            "pageNo": "1",
-            "pageNum": "1",
-            "_": "1615791534490",
+            'type': 'RPTA_WEB_TREASURYYIELD',
+            'sty': 'ALL',
+            'st': 'SOLAR_DATE',
+            'sr': '-1',
+            'token': '894050c76af8597a853f5b408b759f5d',
+            'p': '1',
+            'ps': '500',
+            'pageNo': '1',
+            'pageNum': '1',
+            '_': '1615791534490',
         }
         r = requests.get(url, params=params, timeout=60)
         data_json = r.json()
-        total_page = data_json["result"]["pages"]
+        total_page = data_json['result']['pages']
         big_df = pd.DataFrame()
         for page in range(1, total_page + 1):
             params = {
-                "type": "RPTA_WEB_TREASURYYIELD",
-                "sty": "ALL",
-                "st": "SOLAR_DATE",
-                "sr": "-1",
-                "token": "894050c76af8597a853f5b408b759f5d",
-                "p": page,
-                "ps": "500",
-                "pageNo": page,
-                "pageNum": page,
-                "_": "1615791534490",
+                'type': 'RPTA_WEB_TREASURYYIELD',
+                'sty': 'ALL',
+                'st': 'SOLAR_DATE',
+                'sr': '-1',
+                'token': '894050c76af8597a853f5b408b759f5d',
+                'p': page,
+                'ps': '500',
+                'pageNo': page,
+                'pageNum': page,
+                '_': '1615791534490',
             }
             r = requests.get(url, params=params, timeout=60)
             data_json = r.json()
             # 时间过滤
             if start_date and end_date:
                 temp_data = []
-                for item in data_json["result"]["data"]:
-                    if start_date <= item["SOLAR_DATE"].split(" ")[0] <= end_date:
+                for item in data_json['result']['data']:
+                    if start_date <= item['SOLAR_DATE'].split(' ')[0] <= end_date:
                         temp_data.append(item)
-                    elif start_date > item["SOLAR_DATE"].split(" ")[0]:
+                    elif start_date > item['SOLAR_DATE'].split(' ')[0]:
                         break
                     else:
                         continue
             else:
-                temp_data = data_json["result"]["data"]
+                temp_data = data_json['result']['data']
             temp_df = pd.DataFrame(temp_data)
             for col in temp_df.columns:
                 if temp_df[col].isnull().all():  # 检查列是否包含 None 或 NaN
@@ -491,58 +491,58 @@ M0数量（单位：亿元），M0 同比（单位：%），M0 环比（单位�
 
         big_df.rename(
             columns={
-                "SOLAR_DATE": "日期",
-                "EMM00166462": "中国国债收益率5年",
-                "EMM00166466": "中国国债收益率10年",
-                "EMM00166469": "中国国债收益率30年",
-                "EMM00588704": "中国国债收益率2年",
-                "EMM01276014": "中国国债收益率10年-2年",
-                "EMG00001306": "美国国债收益率2年",
-                "EMG00001308": "美国国债收益率5年",
-                "EMG00001310": "美国国债收益率10年",
-                "EMG00001312": "美国国债收益率30年",
-                "EMG01339436": "美国国债收益率10年-2年",
-                "EMM00000024": "中国GDP年增率",
-                "EMG00159635": "美国GDP年增率",
+                'SOLAR_DATE': '日期',
+                'EMM00166462': '中国国债收益率5年',
+                'EMM00166466': '中国国债收益率10年',
+                'EMM00166469': '中国国债收益率30年',
+                'EMM00588704': '中国国债收益率2年',
+                'EMM01276014': '中国国债收益率10年-2年',
+                'EMG00001306': '美国国债收益率2年',
+                'EMG00001308': '美国国债收益率5年',
+                'EMG00001310': '美国国债收益率10年',
+                'EMG00001312': '美国国债收益率30年',
+                'EMG01339436': '美国国债收益率10年-2年',
+                'EMM00000024': '中国GDP年增率',
+                'EMG00159635': '美国GDP年增率',
             },
             inplace=True,
         )
         big_df = big_df[
             [
-                "日期",
-                "中国国债收益率2年",
-                "中国国债收益率5年",
-                "中国国债收益率10年",
-                "中国国债收益率30年",
-                "中国国债收益率10年-2年",
-                "中国GDP年增率",
-                "美国国债收益率2年",
-                "美国国债收益率5年",
-                "美国国债收益率10年",
-                "美国国债收益率30年",
-                "美国国债收益率10年-2年",
-                "美国GDP年增率",
+                '日期',
+                '中国国债收益率2年',
+                '中国国债收益率5年',
+                '中国国债收益率10年',
+                '中国国债收益率30年',
+                '中国国债收益率10年-2年',
+                '中国GDP年增率',
+                '美国国债收益率2年',
+                '美国国债收益率5年',
+                '美国国债收益率10年',
+                '美国国债收益率30年',
+                '美国国债收益率10年-2年',
+                '美国GDP年增率',
             ]
         ]
-        big_df = big_df.drop(["中国GDP年增率", "美国GDP年增率"], axis=1)
-        big_df["日期"] = pd.to_datetime(big_df["日期"], errors="coerce")
-        big_df["中国国债收益率2年"] = pd.to_numeric(big_df["中国国债收益率2年"], errors="coerce")
-        big_df["中国国债收益率5年"] = pd.to_numeric(big_df["中国国债收益率5年"], errors="coerce")
-        big_df["中国国债收益率10年"] = pd.to_numeric(big_df["中国国债收益率10年"], errors="coerce")
-        big_df["中国国债收益率30年"] = pd.to_numeric(big_df["中国国债收益率30年"], errors="coerce")
-        big_df["中国国债收益率10年-2年"] = pd.to_numeric(big_df["中国国债收益率10年-2年"], errors="coerce")
+        big_df = big_df.drop(['中国GDP年增率', '美国GDP年增率'], axis=1)
+        big_df['日期'] = pd.to_datetime(big_df['日期'], errors='coerce')
+        big_df['中国国债收益率2年'] = pd.to_numeric(big_df['中国国债收益率2年'], errors='coerce')
+        big_df['中国国债收益率5年'] = pd.to_numeric(big_df['中国国债收益率5年'], errors='coerce')
+        big_df['中国国债收益率10年'] = pd.to_numeric(big_df['中国国债收益率10年'], errors='coerce')
+        big_df['中国国债收益率30年'] = pd.to_numeric(big_df['中国国债收益率30年'], errors='coerce')
+        big_df['中国国债收益率10年-2年'] = pd.to_numeric(big_df['中国国债收益率10年-2年'], errors='coerce')
         # big_df["中国GDP年增率"] = pd.to_numeric(big_df["中国GDP年增率"], errors="coerce")
-        big_df["美国国债收益率2年"] = pd.to_numeric(big_df["美国国债收益率2年"], errors="coerce")
-        big_df["美国国债收益率5年"] = pd.to_numeric(big_df["美国国债收益率5年"], errors="coerce")
-        big_df["美国国债收益率10年"] = pd.to_numeric(big_df["美国国债收益率10年"], errors="coerce")
-        big_df["美国国债收益率30年"] = pd.to_numeric(big_df["美国国债收益率30年"], errors="coerce")
-        big_df["美国国债收益率10年-2年"] = pd.to_numeric(big_df["美国国债收益率10年-2年"], errors="coerce")
+        big_df['美国国债收益率2年'] = pd.to_numeric(big_df['美国国债收益率2年'], errors='coerce')
+        big_df['美国国债收益率5年'] = pd.to_numeric(big_df['美国国债收益率5年'], errors='coerce')
+        big_df['美国国债收益率10年'] = pd.to_numeric(big_df['美国国债收益率10年'], errors='coerce')
+        big_df['美国国债收益率30年'] = pd.to_numeric(big_df['美国国债收益率30年'], errors='coerce')
+        big_df['美国国债收益率10年-2年'] = pd.to_numeric(big_df['美国国债收益率10年-2年'], errors='coerce')
         # big_df["美国GDP年增率"] = pd.to_numeric(big_df["美国GDP年增率"], errors="coerce")
-        big_df.sort_values("日期", inplace=True)
-        big_df.set_index(["日期"], inplace=True)
+        big_df.sort_values('日期', inplace=True)
+        big_df.set_index(['日期'], inplace=True)
         big_df = big_df[pd.to_datetime(start_date):]
         big_df.reset_index(inplace=True)
-        big_df["日期"] = pd.to_datetime(big_df["日期"]).dt.date
+        big_df['日期'] = pd.to_datetime(big_df['日期']).dt.date
         return big_df.to_markdown()
 
     @classmethod
