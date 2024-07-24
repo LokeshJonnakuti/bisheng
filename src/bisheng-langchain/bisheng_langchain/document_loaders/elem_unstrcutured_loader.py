@@ -85,7 +85,7 @@ class ElemUnstructuredLoader(BasePDFLoader):
                        mode='partition',
                        parameters=parameters)
 
-        resp = requests.post(self.unstructured_api_url, headers=self.headers, json=payload)
+        resp = requests.post(self.unstructured_api_url, headers=self.headers, json=payload, timeout=60)
         if resp.status_code != 200:
             raise Exception(f'file partition {os.path.basename(self.file_name)} failed resp={resp.text}')
 
@@ -137,7 +137,7 @@ class ElemUnstructuredLoaderV0(BasePDFLoader):
         payload = dict(filename=os.path.basename(self.file_name), b64_data=[b64_data], mode='text')
         payload.update({'start': self.start, 'n': self.n})
         payload.update(self.extra_kwargs)
-        resp = requests.post(self.unstructured_api_url, headers=self.headers, json=payload)
+        resp = requests.post(self.unstructured_api_url, headers=self.headers, json=payload, timeout=60)
         # 说明文件解析成功
         if resp.status_code == 200 and resp.json().get('status_code') == 200:
             res = resp.json()
@@ -151,14 +151,14 @@ class ElemUnstructuredLoaderV0(BasePDFLoader):
             'filename': os.path.basename(self.file_name),
             'b64_data': [b64_data],
             'mode': 'topdf',
-        })
+        }, timeout=60)
         if resp.status_code != 200 or resp.json().get('status_code') != 200:
             raise Exception(f'file topdf {os.path.basename(self.file_name)} failed resp={resp.text}')
         # 解析pdf文件
         payload['mode'] = 'partition'
         payload['b64_data'] = [resp.json()['b64_pdf']]
         payload['filename'] = os.path.basename(self.file_name) + '.pdf'
-        resp = requests.post(self.unstructured_api_url, headers=self.headers, json=payload)
+        resp = requests.post(self.unstructured_api_url, headers=self.headers, json=payload, timeout=60)
         if resp.status_code != 200 or resp.json().get('status_code') != 200:
             raise Exception(f'file partition {os.path.basename(self.file_name)} failed resp={resp.text}')
         res = resp.json()

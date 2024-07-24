@@ -17,7 +17,7 @@ def get_access_token(api_key, sec_key):
         'Accept': 'application/json'
     }
 
-    response = requests.request('POST', url, headers=headers, data=payload)
+    response = requests.request('POST', url, headers=headers, data=payload, timeout=60)
     return response.json().get('access_token')
 
 
@@ -76,7 +76,7 @@ class ChatCompletion(object):
         elif model == 'ernie-bot-4':
             endpoint = f'{self.ep_url_pro}?access_token={token}'
 
-        response = requests.post(endpoint, headers=self.headers, json=payload)
+        response = requests.post(endpoint, headers=self.headers, json=payload, timeout=60)
 
         req_type = 'chat.completion'
         status_message = 'success'

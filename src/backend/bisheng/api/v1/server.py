@@ -185,7 +185,7 @@ async def unload(*, deploy_id: dict):
             raise HTTPException(status_code=404, detail='配置不存在')
         endpoint = db_deploy.endpoint.replace('http://', '').split('/')[0]
         url = f'http://{endpoint}/v2/repository/models/{db_deploy.model}/unload'
-        resp = requests.post(url)
+        resp = requests.post(url, timeout=60)
         logger.info(f'unload_model=success url={url} code={resp.status_code}')
         # 更新状态
         db_deploy.status = '下线中'
@@ -229,7 +229,7 @@ async def get_gpu():
 
 
 def load_model(url: str, data: str, deploy_id: int):
-    response = requests.post(url, data=data)
+    response = requests.post(url, data=data, timeout=60)
     if response.status_code == 200:
         logger.info(f'load_model={url} result=success')
     else:
@@ -248,7 +248,7 @@ pattern = r'gpu_uuid="([^"]+)"'
 
 
 async def queryGPU(query_url: str):
-    resp = requests.get(query_url)
+    resp = requests.get(query_url, timeout=60)
     if resp.status_code != 200:
         return []
     content = resp.text
@@ -298,7 +298,7 @@ async def queryGPU(query_url: str):
 async def update_model(endpoint: str, server_id: int):
     try:
         url = f'http://{endpoint}/v2/repository/index'
-        resp = requests.post(url)
+        resp = requests.post(url, timeout=60)
         if resp.status_code != 200:
             return []
         content = resp.text
@@ -338,7 +338,7 @@ async def update_model(endpoint: str, server_id: int):
             if not db_model.config:
                 # 初始化config
                 config_url = f'http://{endpoint}/v2/repository/models/{model_name}/config'
-                resp = requests.post(config_url)
+                resp = requests.post(config_url, timeout=60)
                 db_model.config = resp.text
             session.add(db_model)
         if model_delete:

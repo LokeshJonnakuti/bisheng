@@ -22,7 +22,7 @@ class LayoutParser(object):
     def parse(self, blob: Blob) -> List[Document]:
         b64_data = base64.b64encode(blob.as_bytes()).decode()
         data = {'img': b64_data}
-        resp = requests.post('http://192.168.106.20:14569/predict', data=data)
+        resp = requests.post('http://192.168.106.20:14569/predict', data=data, timeout=60)
         content = resp.json()
         doc = Document(page_content=json.dumps(content), metadata={})
         return [doc]

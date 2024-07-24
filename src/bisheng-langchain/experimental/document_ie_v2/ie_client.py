@@ -84,5 +84,5 @@ data['system_message'] = system_message
 
 url = "http://192.168.106.20:6118/document_ie"
 headers = {"Content-Type": "application/json"}
-r = requests.post(url=url, headers=headers, json=data).json()
+r = requests.post(url=url, headers=headers, json=data, timeout=60).json()
 print(r)

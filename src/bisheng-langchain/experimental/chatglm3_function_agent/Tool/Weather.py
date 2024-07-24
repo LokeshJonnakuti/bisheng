@@ -19,7 +19,7 @@ class Weather(BaseTool):
     def get_weather(self, location):
         api_key = os.environ["SENIVERSE_KEY"]
         url = f"https://api.seniverse.com/v3/weather/now.json?key={api_key}&location={location}&language=zh-Hans&unit=c"
-        response = requests.get(url)
+        response = requests.get(url, timeout=60)
         if response.status_code == 200:
             data = response.json()
             weather = {
