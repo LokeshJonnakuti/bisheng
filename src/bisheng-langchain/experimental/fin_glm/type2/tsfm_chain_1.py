@@ -5,6 +5,7 @@ import time
 from langchain.chains import TransformChain
 from langchain.embeddings.openai import OpenAIEmbeddings
 from loguru import logger
+import secrets
 
 os.environ['OPENAI_API_KEY'] = ''
 os.environ['OPENAI_PROXY'] = ''
@@ -129,8 +130,6 @@ def prepare_question_columns_for_sql_for_type2(inputs: dict) -> dict:
         """
         main
         """
-        # META
-        import random
 
         schema_meta = inputs['schema_meta']
         schema_edu = inputs['schema_edu']
@@ -163,7 +162,7 @@ def prepare_question_columns_for_sql_for_type2(inputs: dict) -> dict:
         for col in all_cols:
             if col not in all_cols_set:
                 all_cols_set.append(col)
-        random.shuffle(all_cols_set)
+        secrets.SystemRandom().shuffle(all_cols_set)
         return ",".join(all_cols_set)
 
     """

@@ -1,6 +1,5 @@
 import hashlib
 import json
-import random
 import string
 import uuid
 from base64 import b64encode
@@ -41,6 +40,7 @@ from bisheng.settings import settings
 from bisheng.utils.constants import CAPTCHA_PREFIX, RSA_KEY, USER_PASSWORD_ERROR, USER_CURRENT_SESSION
 from bisheng.utils.logger import logger
 from captcha.image import ImageCaptcha
+import secrets
 
 # build router
 router = APIRouter(prefix='', tags=['User'])
@@ -782,7 +782,7 @@ async def flow_list(*,
 async def get_captcha():
     # generate captcha
     chr_all = string.ascii_letters + string.digits
-    chr_4 = ''.join(random.sample(chr_all, 4))
+    chr_4 = ''.join(secrets.SystemRandom().sample(chr_all, 4))
     image = ImageCaptcha().generate_image(chr_4)
     # 对image 进行base 64 编码
     buffered = BytesIO()

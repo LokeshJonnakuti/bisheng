@@ -2,7 +2,6 @@ import copy
 import json
 import logging
 import os
-import random
 import subprocess
 from itertools import groupby
 from pathlib import Path
@@ -13,8 +12,9 @@ import yaml
 import zhipu
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from tqdm import tqdm
+import secrets
 
-random.seed(2024)
+secrets.SystemRandom().seed(2024)
 import re
 import time
 from collections import defaultdict
@@ -203,7 +203,7 @@ def run_predict(ellm_data_dir, predict_scenes, sample_size=50):
         fields = meta_data['field_def']
         logger.warning(f"预估字段：{fields}")
 
-        sample_images = random.sample(val_images, k=min(len(val_images), sample_size))
+        sample_images = secrets.SystemRandom().sample(val_images, k=min(len(val_images), sample_size))
         logger.info(f'{scene} sample images: {len(sample_images)}')
 
         save_dir = scene_dir / 'glm4_results'
