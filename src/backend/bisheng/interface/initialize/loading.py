@@ -25,6 +25,7 @@ from bisheng.interface.wrappers.base import wrapper_creator
 from bisheng.settings import settings
 from bisheng.utils import validate
 from bisheng.utils.constants import NODE_ID_DICT, PRESET_QUESTION
+from bisheng.utils.embedding import decide_embeddings
 from bisheng_langchain.vectorstores import VectorStoreFilterRetriever
 from langchain.agents import agent as agent_module
 from langchain.agents.agent import AgentExecutor
@@ -38,8 +39,6 @@ from langchain_community.utils.openai import is_openai_v1
 from loguru import logger
 from pydantic import SecretStr, ValidationError, create_model
 from pydantic.fields import FieldInfo
-
-from bisheng.utils.embedding import decide_embeddings
 
 if TYPE_CHECKING:
     from bisheng import CustomComponent
@@ -480,13 +479,13 @@ def instantiate_vectorstore(node_type: str, class_object: Type[VectorStore], par
 
     # 过滤掉用户没有权限的知识库
     # TODO zgq 后续统一技能执行流程后将和业务有关的逻辑都迁移到初始化技能对象之前
-    if node_type == "MilvusWithPermissionCheck" or node_type == "ElasticsearchWithPermissionCheck":
-        col_name = "collection_name"
-        if node_type == "ElasticsearchWithPermissionCheck":
-            col_name = "index_name"
+    if node_type == 'MilvusWithPermissionCheck' or node_type == 'ElasticsearchWithPermissionCheck':
+        col_name = 'collection_name'
+        if node_type == 'ElasticsearchWithPermissionCheck':
+            col_name = 'index_name'
 
         # 获取执行用户 有权限查看的知识库列表
-        knowledge_ids = [one["key"] for one in params[col_name]]
+        knowledge_ids = [one['key'] for one in params[col_name]]
         knowledge_list = KnowledgeDao.judge_knowledge_permission(user_name, knowledge_ids)
         logger.debug(f"{node_type} after filter, get knowledge_list: {knowledge_list}")
 
@@ -494,16 +493,16 @@ def instantiate_vectorstore(node_type: str, class_object: Type[VectorStore], par
             logger.warning(f"{node_type}: after filter, get zero knowledge")
 
         # 没有任何知识库的话，提供假的embedding和空的collection_name
-        if node_type == "MilvusWithPermissionCheck":
+        if node_type == 'MilvusWithPermissionCheck':
             params[col_name] = []
-            params["partition_keys"] = []
+            params['partition_keys'] = []
             for knowledge in knowledge_list:
                 params[col_name].append(knowledge.collection_name)
-                if knowledge.collection_name.startswith("partition"):
-                    params["partition_keys"].append(knowledge.id)
+                if knowledge.collection_name.startswith('partition'):
+                    params['partition_keys'].append(knowledge.id)
                 else:
-                    params["partition_keys"].append(None)
-            params["embedding"] = decide_embeddings(knowledge_list[0].model) if knowledge_list else FakeEmbedding()
+                    params['partition_keys'].append(None)
+            params['embedding'] = decide_embeddings(knowledge_list[0].model) if knowledge_list else FakeEmbedding()
         else:
             params[col_name] = [knowledge.index_name or knowledge.collection_name
                                 for knowledge in knowledge_list]

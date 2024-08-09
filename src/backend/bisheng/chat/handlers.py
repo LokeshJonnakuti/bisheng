@@ -37,7 +37,7 @@ class Handler:
 
     async def dispatch_task(self, session: ChatManager, client_id: str, chat_id: str, action: str,
                             payload: dict, user_id):
-        logger.info(f'dispatch_task payload={payload.get("inputs")}')
+        logger.info(f'dispatch_task payload={payload.get('inputs')}')
         start_time = time.time()
         with session.cache_manager.set_client_id(client_id, chat_id):
             if not action:

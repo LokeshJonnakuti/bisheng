@@ -1,28 +1,27 @@
 import json
 from datetime import datetime
-from typing import List, Any, Dict
+from typing import Any, Dict, List
 from uuid import UUID
 
-from fastapi.encoders import jsonable_encoder
-from fastapi import Request, HTTPException
-
-from bisheng.cache.redis import redis_client
+from bisheng.api.errcode.user import UserGroupNotDeleteError
 from bisheng.api.services.assistant import AssistantService
 from bisheng.api.services.audit_log import AuditLogService
 from bisheng.api.services.user_service import UserPayload
-from bisheng.api.errcode.user import UserGroupNotDeleteError
 from bisheng.api.utils import get_request_ip
 from bisheng.api.v1.schemas import resp_200
+from bisheng.cache.redis import redis_client
 from bisheng.database.models.assistant import AssistantDao
 from bisheng.database.models.flow import FlowDao
 from bisheng.database.models.gpts_tools import GptsToolsDao
-from bisheng.database.models.group import Group, GroupCreate, GroupDao, GroupRead, DefaultGroup
+from bisheng.database.models.group import DefaultGroup, Group, GroupCreate, GroupDao, GroupRead
 from bisheng.database.models.group_resource import GroupResourceDao, ResourceTypeEnum
 from bisheng.database.models.knowledge import KnowledgeDao
 from bisheng.database.models.role import AdminRole, RoleDao
 from bisheng.database.models.user import User, UserDao
-from bisheng.database.models.user_role import UserRoleDao
 from bisheng.database.models.user_group import UserGroupCreate, UserGroupDao, UserGroupRead
+from bisheng.database.models.user_role import UserRoleDao
+from fastapi import HTTPException, Request
+from fastapi.encoders import jsonable_encoder
 from loguru import logger
 
 
@@ -130,7 +129,7 @@ class RoleGroupService():
         # 删除用户组的管理员
         UserGroupDao.delete_group_all_admin(group_info.id)
         # 将删除事件发到redis队列中
-        delete_message = json.dumps({"id": group_info.id})
+        delete_message = json.dumps({'id': group_info.id})
         redis_client.rpush('delete_group', delete_message)
         redis_client.expire_key('delete_group', 86400)
         redis_client.publish('delete_group', delete_message)
@@ -193,11 +192,11 @@ class RoleGroupService():
         group_dict: Dict[int, str] = {}
         for one in group_infos:
             group_dict[one.id] = one.group_name
-        note = "编辑前用户组："
+        note = '编辑前用户组：'
         for one in old_group:
             note += f'{group_dict.get(one, one)}、'
         note = note.rstrip('、')
-        note += "编辑后用户组："
+        note += '编辑后用户组：'
         for one in group_ids:
             note += f'{group_dict.get(one, one)}、'
         note = note.rstrip('、')
@@ -275,7 +274,7 @@ class RoleGroupService():
         user_map = self.get_user_map(db_user_ids)
         for one in data:
             one_dict = jsonable_encoder(one)
-            one_dict["user_name"] = user_map.get(one.user_id, one.user_id)
+            one_dict['user_name'] = user_map.get(one.user_id, one.user_id)
             res.append(one_dict)
 
         return res, total
@@ -294,7 +293,7 @@ class RoleGroupService():
         user_map = self.get_user_map(db_user_ids)
         for one in data:
             one_dict = jsonable_encoder(one)
-            one_dict["user_name"] = user_map.get(one.user_id, one.user_id)
+            one_dict['user_name'] = user_map.get(one.user_id, one.user_id)
             res.append(one_dict)
         return res, total
 
@@ -326,6 +325,6 @@ class RoleGroupService():
         user_map = self.get_user_map(db_user_ids)
         for one in data:
             one_dict = jsonable_encoder(one)
-            one_dict["user_name"] = user_map.get(one.user_id, one.user_id)
+            one_dict['user_name'] = user_map.get(one.user_id, one.user_id)
             res.append(one_dict)
         return res, total

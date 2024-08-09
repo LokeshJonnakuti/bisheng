@@ -1,18 +1,18 @@
 import os
 import shutil
+from collections import defaultdict
 
 import httpx
 import nest_asyncio
 import pandas as pd
-
-nest_asyncio.apply()
-from collections import defaultdict
-
 from llama_index import ServiceContext
 from llama_index.embeddings.openai import OpenAIEmbedding
 from llama_index.evaluation import CorrectnessEvaluator
 from llama_index.llms import OpenAI
 from tqdm import tqdm
+
+nest_asyncio.apply()
+
 
 openai_api_key = os.environ.get('OPENAI_API_KEY', '')
 openai_proxy = os.environ.get('OPENAI_PROXY', '')
@@ -21,7 +21,7 @@ openai_proxy = os.environ.get('OPENAI_PROXY', '')
 def llama_index_answer_correctness(querys, responses, references):
     embed = OpenAIEmbedding(api_key=openai_api_key, http_client=httpx.AsyncClient(proxies=openai_proxy))
 
-    model_name = "gpt-3.5-turbo-16k"
+    model_name = 'gpt-3.5-turbo-16k'
     service_context = ServiceContext.from_defaults(
         llm=OpenAI(model=model_name, api_key=openai_api_key, http_client=httpx.AsyncClient(proxies=openai_proxy)),
         embed_model=embed,

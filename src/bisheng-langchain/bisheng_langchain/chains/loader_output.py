@@ -1,13 +1,10 @@
 """Chain that runs an arbitrary python function."""
 import functools
-import logging
 import json
+import logging
 from typing import Any, Awaitable, Callable, Dict, List, Optional
 
-from langchain.callbacks.manager import (
-    AsyncCallbackManagerForChainRun,
-    CallbackManagerForChainRun,
-)
+from langchain.callbacks.manager import AsyncCallbackManagerForChainRun, CallbackManagerForChainRun
 from langchain.chains.base import Chain
 from langchain.docstore.document import Document
 
@@ -18,8 +15,8 @@ class LoaderOutputChain(Chain):
     """Chain that print the loader output.
     """
     documents: List[Document]
-    input_key: str = "begin"  #: :meta private:
-    output_key: str = "text"  #: :meta private:
+    input_key: str = 'begin'  #: :meta private:
+    output_key: str = 'text'  #: :meta private:
 
     @staticmethod
     @functools.lru_cache

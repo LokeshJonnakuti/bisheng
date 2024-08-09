@@ -2,11 +2,10 @@ import logging
 from pathlib import Path
 
 import orjson
+from bisheng.settings import LoggerConf
 from loguru import logger
 from rich.console import Console
 from rich.logging import RichHandler
-
-from bisheng.settings import LoggerConf
 
 VALID_LOG_LEVELS = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL', 'EXCEPTION']
 
@@ -52,7 +51,7 @@ def configure(logger_conf: LoggerConf):
         log_file = Path(one['sink'])
         log_file.parent.mkdir(parents=True, exist_ok=True)
         logger.add(**one)
-        logger.debug(f'Logger set up with log handler: {one["sink"]}')
+        logger.debug(f'Logger set up with log handler: {one['sink']}')
 
     logger.debug(f'Logger set up with log level: {log_level}')
 

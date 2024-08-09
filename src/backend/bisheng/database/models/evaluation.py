@@ -1,10 +1,10 @@
 from datetime import datetime
 from enum import Enum
-from typing import List, Optional, Dict
+from typing import Dict, List, Optional
 
 from bisheng.database.base import session_getter
 from bisheng.database.models.base import SQLModelSerializable
-from sqlalchemy import Column, DateTime, Text, text, func, and_, JSON
+from sqlalchemy import JSON, Column, DateTime, Text, and_, func, text
 from sqlmodel import Field, select
 
 

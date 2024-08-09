@@ -1,15 +1,15 @@
-import os
-import json
 import copy
-import pandas as pd
-from loguru import logger
-from tqdm import tqdm
-from langchain.document_loaders import PyPDFLoader
-from langchain_core.prompts import PromptTemplate
-from bisheng_langchain.document_loaders import ElemUnstructuredLoader
-from bisheng_ragas.trainset import TrainsetGenerator
+import json
+import os
 import secrets
 
+import pandas as pd
+from bisheng_langchain.document_loaders import ElemUnstructuredLoader
+from bisheng_ragas.trainset import TrainsetGenerator
+from langchain.document_loaders import PyPDFLoader
+from langchain_core.prompts import PromptTemplate
+from loguru import logger
+from tqdm import tqdm
 
 prompt_template = """Use the following pieces of context to answer the question at the end. If you don't know the answer, just say that you don't know, don't try to make up an answer.
 
@@ -18,24 +18,24 @@ prompt_template = """Use the following pieces of context to answer the question 
 Question: {question}
 Helpful Answer:"""
 PROMPT = PromptTemplate(
-    template=prompt_template, input_variables=["context", "question"]
+    template=prompt_template, input_variables=['context', 'question']
 )
 
 
 class RagQAGenerator(object):
 
-    def __init__(self, 
+    def __init__(self,
                  corpus_folder,
                  qa_gen_folder,
-                 unstructured_api_url="https://bisheng.dataelem.com/api/v1/etl4llm/predict",
-                 model_name="gpt-4-0125-preview"):
+                 unstructured_api_url='https://bisheng.dataelem.com/api/v1/etl4llm/predict',
+                 model_name='gpt-4-0125-preview'):
         self.unstructured_api_url = unstructured_api_url
         self.corpus_folder = corpus_folder
         self.qa_gen_folder = qa_gen_folder
         self.model_name = model_name
         if not os.path.exists(self.qa_gen_folder):
             os.makedirs(self.qa_gen_folder)
-    
+
     def generate(self):
         for file_name in tqdm(os.listdir(self.corpus_folder)):
             file_path = os.path.join(self.corpus_folder, file_name)
@@ -65,7 +65,7 @@ class RagQAGenerator(object):
         df = trainset.to_pandas()
         df.to_excel(save_path, index=False)
         return save_path
-    
+
     def statistic_qa(self):
         total_qa_num = 0
         all_qa_info = dict()
@@ -94,15 +94,15 @@ class RagQAGenerator(object):
             for qa in qa_info:
                 ground_truth_context = str(eval(qa['ground_truth_context'])[0])
                 contexts.append(ground_truth_context)
-            
+
             secrets.SystemRandom().shuffle(qa_info)
             for i, qa in enumerate(qa_info):
                 question = qa['question']
                 ground_truth_context = str(eval(qa['ground_truth_context'])[0])
                 ground_truth = str(eval(qa['ground_truth'])[0])
-                
+
                 # 加入其他干扰context
-                random_number = secrets.SystemRandom().randint(min(min_context_num, len(contexts)), 
+                random_number = secrets.SystemRandom().randint(min(min_context_num, len(contexts)),
                     min(max_context_num, len(contexts))
                 )
                 random_context = secrets.SystemRandom().sample(contexts, random_number)
@@ -115,8 +115,8 @@ class RagQAGenerator(object):
                 random_context = '\n\n'.join(random_context)
                 prompt = PROMPT.format(context=random_context, question=question)
                 each_sample = {
-                    'instruction': '', 
-                    'input': prompt, 
+                    'instruction': '',
+                    'input': prompt,
                     'output': ground_truth,
                     'history': []
                 }
@@ -124,7 +124,7 @@ class RagQAGenerator(object):
                     train_samples.append(each_sample)
                 else:
                     test_samples.append(each_sample)
-             
+
         logger.info(f'train_samples: {len(train_samples)} test_samples: {len(test_samples)}')
         save_folder = os.path.dirname(self.qa_gen_folder)
         with open(os.path.join(save_folder, f'train_samples_ganrao_chunk{max_context_num+1}.json'), 'w') as f:

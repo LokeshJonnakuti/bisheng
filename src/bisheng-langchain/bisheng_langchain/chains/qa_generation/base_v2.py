@@ -1,15 +1,29 @@
 from __future__ import annotations
 
-import re
 import json
 import logging
+import re
 import typing as t
 import warnings
-from typing import Any, Dict, List, Optional
 from collections import defaultdict, namedtuple
 from dataclasses import dataclass
+from typing import Any, Dict, List, Optional
+
+import numpy as np
+import numpy.testing as npt
+import pandas as pd
+# from langchain.schema.document import Document as LangchainDocument
+from langchain.chains.base import Chain
+from langchain.docstore.document import Document
+from langchain.prompts import ChatPromptTemplate
 from langchain_core.callbacks import CallbackManagerForChainRun
 from langchain_core.language_models import BaseLanguageModel
+from numpy.random import default_rng
+from tqdm import tqdm
+
+from .base import parse_json
+from .prompt_v2 import (ANSWER_FORMULATE, FILTER_QUESTION_CHAT_PROMPT, SCORE_CONTEXT_CHAT_PROMPT,
+                        SEED_QUESTION_CHAT_PROMPT)
 
 try:
     from llama_index.node_parser import SimpleNodeParser
@@ -17,25 +31,9 @@ try:
     from llama_index.schema import BaseNode
 except ImportError:
     raise ImportError(
-        "llama_index must be installed to use this function. "
-        "Please, install it with `pip install llama_index`."
+        'llama_index must be installed to use this function. '
+        'Please, install it with `pip install llama_index`.'
     )
-import numpy as np
-import numpy.testing as npt
-import pandas as pd
-from langchain.prompts import ChatPromptTemplate
-from langchain.docstore.document import Document
-# from langchain.schema.document import Document as LangchainDocument
-from langchain.chains.base import Chain
-from numpy.random import default_rng
-from tqdm import tqdm
-from .prompt_v2 import (
-    SEED_QUESTION_CHAT_PROMPT,
-    SCORE_CONTEXT_CHAT_PROMPT,
-    FILTER_QUESTION_CHAT_PROMPT,
-    ANSWER_FORMULATE,
-)
-from .base import parse_json
 
 logger = logging.getLogger(__name__)
 
@@ -44,9 +42,9 @@ def load_as_score(text):
     """
     validate and returns given text as score
     """
-    pattern = r"^[\d.]+$"
+    pattern = r'^[\d.]+$'
     if not re.match(pattern, text):
-        warnings.warn("Invalid score")
+        warnings.warn('Invalid score')
         score = 0.0
     else:
         score = eval(text)
@@ -67,20 +65,20 @@ def load_as_json(text):
 
 
 DEFAULT_TRAIN_DISTRIBUTION = {
-    "simple": 1.0,
-    "reasoning": 0.0,
-    "multi_context": 0.0,
-    "conditional": 0.0,
+    'simple': 1.0,
+    'reasoning': 0.0,
+    'multi_context': 0.0,
+    'conditional': 0.0,
 }
 
 DataRow = namedtuple(
-    "DataRow",
+    'DataRow',
     [
-        "question",
-        "ground_truth_context",
-        "ground_truth",
-        "question_type",
-        "episode_done",
+        'question',
+        'ground_truth_context',
+        'ground_truth',
+        'question_type',
+        'episode_done',
     ],
 )
 
@@ -97,11 +95,11 @@ class TrainDataset:
         data_samples = []
         for data in self.train_data:
             data = {
-                "question": data.question,
-                "ground_truth_context": data.ground_truth_context,
-                "ground_truth": data.ground_truth,
-                "question_type": data.question_type,
-                "episode_done": data.episode_done,
+                'question': data.question,
+                'ground_truth_context': data.ground_truth_context,
+                'ground_truth': data.ground_truth,
+                'question_type': data.question_type,
+                'episode_done': data.episode_done,
             }
             data_samples.append(data)
         return pd.DataFrame.from_records(data_samples)
@@ -140,7 +138,7 @@ class TrainsetGenerator:
         npt.assert_almost_equal(
             1,
             sum(trainset_distribution.values()),
-            err_msg="Sum of distribution should be 1",
+            err_msg='Sum of distribution should be 1',
         )
 
         probs = np.cumsum(list(trainset_distribution.values()))
@@ -180,7 +178,7 @@ class TrainsetGenerator:
                 for key in self.trainset_distribution.keys()
                 if prob <= self.trainset_distribution[key]
             ),
-            "simple",
+            'simple',
         )
 
     def _filter_context(self, context: str) -> bool:
@@ -211,7 +209,7 @@ class TrainsetGenerator:
         results = results.content
         json_results = load_as_json(results)
         print('filter question:', question, json_results)
-        return json_results.get("verdict") != "No"
+        return json_results.get('verdict') != 'No'
 
     def _qc_template(self, prompt, question, context) -> str:
         human_prompt = prompt.format(question=question, context=context)
@@ -222,7 +220,7 @@ class TrainsetGenerator:
     def _generate_answer(self, question: str, context: t.List[str]) -> t.List[str]:
         return [
             self._qc_template(ANSWER_FORMULATE, qstn, context[i])
-            for i, qstn in enumerate(question.split("\n"))
+            for i, qstn in enumerate(question.split('\n'))
         ]
 
     def _remove_nodes(
@@ -246,7 +244,7 @@ class TrainsetGenerator:
             self, node: BaseNode, related_nodes: t.List[BaseNode]
     ) -> t.List[BaseNode]:
         if len(related_nodes) < 2:
-            warnings.warn("No neighbors exists")
+            warnings.warn('No neighbors exists')
             return [node]
         idx = related_nodes.index(node)
         ids = [idx - 1, idx] if idx == (len(related_nodes) - 1) else [idx, idx + 1]
@@ -259,7 +257,7 @@ class TrainsetGenerator:
     ) -> TrainDataset:
         if not isinstance(documents[0], (LlamaindexDocument, Document)):
             raise ValueError(
-                "Trainset Generatation only supports LlamaindexDocuments or Documents"  # noqa
+                'Trainset Generatation only supports LlamaindexDocuments or Documents'  # noqa
             )
 
         if isinstance(documents[0], Document):
@@ -279,7 +277,7 @@ class TrainsetGenerator:
         # # maximum 1 seed question per node
         # if train_size > len(document_nodes):
         #     raise ValueError(
-        #         """Maximum possible number of samples exceeded, 
+        #         """Maximum possible number of samples exceeded,
         #                      reduce train_size or add more documents"""
         #     )
 
@@ -287,7 +285,7 @@ class TrainsetGenerator:
         doc_nodes_map = self._generate_doc_nodes_map(document_nodes)
         count_neighbours = sum(len(val) > 1 for _, val in doc_nodes_map.items())
         if count_neighbours < len(documents) // 2:
-            warnings.warn("Most documents are too short")
+            warnings.warn('Most documents are too short')
 
         count = 0
         samples = []
@@ -304,11 +302,11 @@ class TrainsetGenerator:
             size = self.rng.integers(1, 3)
             nodes = (
                 self._get_neighbour_node(curr_node, neighbor_nodes)
-                if size > 1 and evolve_type != "multi_context"
+                if size > 1 and evolve_type != 'multi_context'
                 else [curr_node]
             )
 
-            text_chunk = " ".join([node.get_content() for node in nodes])
+            text_chunk = ' '.join([node.get_content() for node in nodes])
             score = self._filter_context(text_chunk)
             if not score:
                 continue
@@ -318,11 +316,11 @@ class TrainsetGenerator:
             # is_valid_question = self._filter_question(question)
             is_valid_question = True
             if is_valid_question:
-                context = [text_chunk] * len(question.split("\n"))
+                context = [text_chunk] * len(question.split('\n'))
                 is_conv = len(context) > 1
                 answer = self._generate_answer(question, context)
                 for i, (qstn, ctx, ans) in enumerate(
-                        zip(question.split("\n"), context, answer)
+                        zip(question.split('\n'), context, answer)
                 ):
                     episode_done = False if is_conv and i == 0 else True
                     samples.append(
@@ -342,9 +340,9 @@ class QAGenerationChainV2(Chain):
     """LLM Chain that generates responses from user input and context."""
     k: Optional[int] = None
     """Number of questions to generate."""
-    input_key: str = "begin"
+    input_key: str = 'begin'
     """Key of the input to the chain."""
-    output_key: str = "questions"
+    output_key: str = 'questions'
     """Key of the output of the chain."""
 
     @classmethod
@@ -394,14 +392,14 @@ class QAGenerationChainV2(Chain):
             self.k = 1000
         dataset = self.generator.generate(documents=self.documents, train_size=self.k)
         df = dataset.to_pandas()
-        qa_pairs = df.to_dict("records")
+        qa_pairs = df.to_dict('records')
         qa = ''
         for pair in qa_pairs:
             qa += json.dumps(
                 {
-                    "question": pair["question"],
-                    "answer": pair["ground_truth"][0],
-                    "context": pair["ground_truth_context"][0],
+                    'question': pair['question'],
+                    'answer': pair['ground_truth'][0],
+                    'context': pair['ground_truth_context'][0],
                 }, ensure_ascii=False)
         return {self.output_key: qa}
 

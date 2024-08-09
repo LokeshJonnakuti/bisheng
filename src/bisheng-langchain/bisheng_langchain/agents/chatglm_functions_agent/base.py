@@ -151,7 +151,7 @@ class ChatglmFunctionsAgent(BaseSingleActionAgent):
             'Answer the following questions as best as you can. You have access to the following tools:',
             'tools': tools_json
         })
-        query = f"""{prompt.split("Human: ")[-1].strip()}"""
+        query = f"""{prompt.split('Human: ')[-1].strip()}"""
         return ans, query
 
     def _extract_observation(self, prompt: str):

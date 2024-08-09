@@ -26,25 +26,25 @@ class DallEAPIWrapper(BaseModel):
 
     client: Any  #: :meta private:
     async_client: Any = Field(default=None, exclude=True)  #: :meta private:
-    model_name: str = Field(default="dall-e-2", alias="model")
+    model_name: str = Field(default='dall-e-2', alias='model')
     model_kwargs: Dict[str, Any] = Field(default_factory=dict)
-    openai_api_key: Optional[str] = Field(default=None, alias="api_key")
+    openai_api_key: Optional[str] = Field(default=None, alias='api_key')
     """Automatically inferred from env var `OPENAI_API_KEY` if not provided."""
-    openai_api_base: Optional[str] = Field(default=None, alias="base_url")
-    """Base URL path for API requests, leave blank if not using a proxy or service 
+    openai_api_base: Optional[str] = Field(default=None, alias='base_url')
+    """Base URL path for API requests, leave blank if not using a proxy or service
         emulator."""
-    openai_organization: Optional[str] = Field(default=None, alias="organization")
+    openai_organization: Optional[str] = Field(default=None, alias='organization')
     """Automatically inferred from env var `OPENAI_ORG_ID` if not provided."""
     # to support explicit proxy for OpenAI
     openai_proxy: Optional[str] = None
-    request_timeout: Union[float, Tuple[float, float], Any, None] = Field(default=None, alias="timeout")
+    request_timeout: Union[float, Tuple[float, float], Any, None] = Field(default=None, alias='timeout')
     n: int = 1
     """Number of images to generate"""
-    size: str = "1024x1024"
+    size: str = '1024x1024'
     """Size of image to generate"""
-    separator: str = "\n"
+    separator: str = '\n'
     """Separator to use when multiple URLs are returned."""
-    quality: Optional[str] = "standard"
+    quality: Optional[str] = 'standard'
     """Quality of the image that will be generated"""
     max_retries: int = 2
     """Maximum number of retries to make when generating."""
@@ -55,7 +55,7 @@ class DallEAPIWrapper(BaseModel):
     http_client: Union[Any, None] = None
     """Optional httpx.Client."""
     http_async_client: Union[Any, None] = None
-    """Optional httpx.AsyncClient. Only used for async invocations. Must specify 
+    """Optional httpx.AsyncClient. Only used for async invocations. Must specify
         http_client as well if you'd like a custom client for sync invocations."""
 
     class Config:
@@ -67,7 +67,7 @@ class DallEAPIWrapper(BaseModel):
     def build_extra(cls, values: Dict[str, Any]) -> Dict[str, Any]:
         """Build extra kwargs from additional params that were passed in."""
         all_required_field_names = get_pydantic_field_names(cls)
-        extra = values.get("model_kwargs", {})
+        extra = values.get('model_kwargs', {})
         for field_name in list(values):
             if field_name in extra:
                 raise ValueError(f"Found {field_name} supplied twice.")
@@ -86,57 +86,57 @@ class DallEAPIWrapper(BaseModel):
                 f"Instead they were passed in as part of `model_kwargs` parameter."
             )
 
-        values["model_kwargs"] = extra
+        values['model_kwargs'] = extra
         return values
 
     @root_validator()
     def validate_environment(cls, values: Dict) -> Dict:
         """Validate that api key and python package exists in environment."""
-        values["openai_api_key"] = get_from_dict_or_env(values, "openai_api_key", "OPENAI_API_KEY")
+        values['openai_api_key'] = get_from_dict_or_env(values, 'openai_api_key', 'OPENAI_API_KEY')
         # Check OPENAI_ORGANIZATION for backwards compatibility.
-        values["openai_organization"] = (
-            values["openai_organization"] or os.getenv("OPENAI_ORG_ID") or os.getenv("OPENAI_ORGANIZATION") or None
+        values['openai_organization'] = (
+            values['openai_organization'] or os.getenv('OPENAI_ORG_ID') or os.getenv('OPENAI_ORGANIZATION') or None
         )
-        values["openai_api_base"] = values["openai_api_base"] or os.getenv("OPENAI_API_BASE")
-        values["openai_proxy"] = get_from_dict_or_env(
+        values['openai_api_base'] = values['openai_api_base'] or os.getenv('OPENAI_API_BASE')
+        values['openai_proxy'] = get_from_dict_or_env(
             values,
-            "openai_proxy",
-            "OPENAI_PROXY",
-            default="",
+            'openai_proxy',
+            'OPENAI_PROXY',
+            default='',
         )
 
         try:
             import openai
 
         except ImportError:
-            raise ImportError("Could not import openai python package. " "Please install it with `pip install openai`.")
+            raise ImportError('Could not import openai python package. ' 'Please install it with `pip install openai`.')
 
         if is_openai_v1():
             client_params = {
-                "api_key": values["openai_api_key"],
-                "organization": values["openai_organization"],
-                "base_url": values["openai_api_base"],
-                "timeout": values["request_timeout"],
-                "max_retries": values["max_retries"],
-                "default_headers": values["default_headers"],
-                "default_query": values["default_query"],
+                'api_key': values['openai_api_key'],
+                'organization': values['openai_organization'],
+                'base_url': values['openai_api_base'],
+                'timeout': values['request_timeout'],
+                'max_retries': values['max_retries'],
+                'default_headers': values['default_headers'],
+                'default_query': values['default_query'],
                 # "http_client": values["http_client"],
             }
 
-            if not values.get("client"):
-                sync_specific = {"http_client": values["http_client"]}
-                values["client"] = openai.OpenAI(
+            if not values.get('client'):
+                sync_specific = {'http_client': values['http_client']}
+                values['client'] = openai.OpenAI(
                     **client_params,
                     **sync_specific,
                 ).images
-            if not values.get("async_client"):
-                async_specific = {"http_client": values["http_async_client"]}
-                values["async_client"] = openai.AsyncOpenAI(
+            if not values.get('async_client'):
+                async_specific = {'http_client': values['http_async_client']}
+                values['async_client'] = openai.AsyncOpenAI(
                     **client_params,
                     **async_specific,
                 ).images
-        elif not values.get("client"):
-            values["client"] = openai.Image
+        elif not values.get('client'):
+            values['client'] = openai.Image
         else:
             pass
         return values
@@ -154,20 +154,20 @@ class DallEAPIWrapper(BaseModel):
             image_urls = self.separator.join([item.url for item in response.data])
         else:
             response = self.client.create(prompt=query, n=self.n, size=self.size, model=self.model_name)
-            image_urls = self.separator.join([item["url"] for item in response["data"]])
+            image_urls = self.separator.join([item['url'] for item in response['data']])
 
-        return image_urls if image_urls else "No image was generated"
+        return image_urls if image_urls else 'No image was generated'
 
 
 class DallEInput(BaseModel):
-    query: str = Field(description="Description about image.")
+    query: str = Field(description='Description about image.')
 
 
 class DallEImageGenerator(BaseTool):
 
-    name: str = "dalle_image_generator"
+    name: str = 'dalle_image_generator'
     description: str = (
-        "A wrapper around OpenAI DALL-E API. Useful for when you need to generate images from a text description. Input should be an image description."
+        'A wrapper around OpenAI DALL-E API. Useful for when you need to generate images from a text description. Input should be an image description.'
     )
     args_schema: Type[BaseModel] = DallEInput
     api_wrapper: DallEAPIWrapper

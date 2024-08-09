@@ -1,29 +1,26 @@
 import argparse
 import copy
-import time
 import inspect
+import math
 import os
+import time
+from collections import defaultdict
+
 import httpx
 import pandas as pd
 import yaml
-import math
-from collections import defaultdict
-from loguru import logger
-from tqdm import tqdm
-from langchain.docstore.document import Document
-from langchain.chains.question_answering import load_qa_chain
-from langchain.chains.llm import LLMChain
+from bisheng_langchain.rag.extract_info import extract_title
+from bisheng_langchain.rag.init_retrievers import (BaselineVectorRetriever, KeywordRetriever,
+                                                   MixRetriever, SmallerChunksVectorRetriever)
+from bisheng_langchain.rag.scoring.ragas_score import RagScore
+from bisheng_langchain.rag.utils import import_by_type, import_class
 from bisheng_langchain.retrievers import EnsembleRetriever
 from bisheng_langchain.vectorstores import ElasticKeywordsSearch, Milvus
-from bisheng_langchain.rag.init_retrievers import (
-    BaselineVectorRetriever,
-    KeywordRetriever,
-    MixRetriever,
-    SmallerChunksVectorRetriever,
-)
-from bisheng_langchain.rag.scoring.ragas_score import RagScore
-from bisheng_langchain.rag.extract_info import extract_title
-from bisheng_langchain.rag.utils import import_by_type, import_class
+from langchain.chains.llm import LLMChain
+from langchain.chains.question_answering import load_qa_chain
+from langchain.docstore.document import Document
+from loguru import logger
+from tqdm import tqdm
 
 
 class BishengRagPipeline:
@@ -70,8 +67,8 @@ class BishengRagPipeline:
         self.vector_store = Milvus(
             embedding_function=self.embeddings,
             connection_args={
-                "host": self.params['milvus']['host'],
-                "port": self.params['milvus']['port'],
+                'host': self.params['milvus']['host'],
+                'port': self.params['milvus']['port'],
             },
         )
 
@@ -175,7 +172,7 @@ class BishengRagPipeline:
                 #     with open(each_file_path.replace('.pdf', '.txt'), 'r') as f:
                 #         content = f.read()
                 #     documents = [Document(page_content=content, metadata={'source': os.path.basename(each_file_path)})]
-                
+
                 logger.info(f'documents: {len(documents)}, page_content: {len(documents[0].page_content)}')
                 if len(documents[0].page_content) == 0:
                     logger.error(f'{each_file_path} page_content is empty.')
@@ -229,7 +226,7 @@ class BishengRagPipeline:
                 self.ranker = rerank_object(**rerank_params)
             docs = getattr(self, 'ranker').sort_and_filter(question, docs)
 
-        # delete redundancy according to max_content 
+        # delete redundancy according to max_content
         doc_num, doc_content_sum = 0, 0
         for doc in docs:
             doc_content_sum += len(doc.page_content)
@@ -302,12 +299,12 @@ class BishengRagPipeline:
 
             # question answer
             try:
-                ans = qa_chain({"input_documents": docs, "question": question}, return_only_outputs=True)
+                ans = qa_chain({'input_documents': docs, 'question': question}, return_only_outputs=True)
             except Exception as e:
                 logger.error(f'question: {question}\nerror: {e}')
                 ans = {'output_text': str(e)}
             rag_answer = ans['output_text']
-            
+
             # context = '\n\n'.join([doc.page_content for doc in docs])
             # content = prompt.format(context=context, question=question)
 

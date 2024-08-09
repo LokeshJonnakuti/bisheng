@@ -1,9 +1,10 @@
-from loguru import logger
-from langchain_core.pydantic_v1 import BaseModel, Field
 from typing import Any
-from .base import APIToolBase
-from .base import MultArgsSchemaTool
+
+from langchain_core.pydantic_v1 import BaseModel, Field
 from langchain_core.tools import BaseTool
+from loguru import logger
+
+from .base import APIToolBase, MultArgsSchemaTool
 
 
 class FlowTools(APIToolBase):
@@ -36,7 +37,7 @@ class FlowTools(APIToolBase):
         return resp
 
     @classmethod
-    def knowledge_retrieve(cls, collection_id: int = None) -> str:    
+    def knowledge_retrieve(cls, collection_id: int = None) -> str:
 
         flow_id = 'c7985115-a9d2-446a-9c55-40b5728ffb52'
         url = 'http://192.168.106.120:3002/api/v1/process/{}'.format(flow_id)
@@ -56,7 +57,7 @@ class FlowTools(APIToolBase):
             query: str = Field(description='questions to ask')
 
         return cls(url=url, params=params, input_key=input_key, args_schema=InputArgs)
-    
+
     @classmethod
     def get_api_tool(cls, name, **kwargs: Any) -> BaseTool:
         attr_name = name.split('_', 1)[-1]
@@ -68,4 +69,3 @@ class FlowTools(APIToolBase):
                                   func=class_method(**kwargs).run,
                                   coroutine=class_method(**kwargs).arun,
                                   args_schema=class_method(**kwargs).args_schema)
-    
