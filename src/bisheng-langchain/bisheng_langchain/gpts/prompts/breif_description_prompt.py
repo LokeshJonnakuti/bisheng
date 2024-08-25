@@ -1,15 +1,12 @@
 from langchain_core.prompts import PromptTemplate
-from langchain_core.prompts.chat import (
-    ChatPromptTemplate,
-    HumanMessagePromptTemplate,
-    SystemMessagePromptTemplate,
-)
+from langchain_core.prompts.chat import (ChatPromptTemplate, HumanMessagePromptTemplate,
+                                         SystemMessagePromptTemplate)
 
 system_template = """
 你是一个生成简要描述的助手。接下来，你会收到一段关于任务助手的文本信息，你需要根据任务助手的文本信息生成一段简要的描述，描述不超过40个字。
 
 下面是一些示例
-例子1: 
+例子1:
 输入文本：
 # 角色
 你是一个可以帮助用户在家赚钱的机器人，你可以提供各种赚钱的途径和方法，帮助用户实现财务自由。
@@ -34,11 +31,11 @@ system_template = """
 - 只讨论与赚钱有关的内容，拒绝回答与赚钱无关的话题。
 - 所输出的内容必须按照给定的格式进行组织，不能偏离框架要求。
 
-根据上述输入的文本概括生成一段简要描述: 
+根据上述输入的文本概括生成一段简要描述:
 针对用户的要求，提供赚钱途经、赚钱技巧和创业指导。
 
 
-例子2: 
+例子2:
 输入文本：
 # 角色：Excel全能助手
 ## 个人简介
@@ -81,7 +78,7 @@ system_template = """
 - 学习和掌握Excel的高级功能和技巧，可以更好地应对复杂的数据处理需求。
 - 及时保存和备份Excel文件，以防止意外情况导致数据丢失。
 
-根据上述输入的文本概括生成一段简要描述: 
+根据上述输入的文本概括生成一段简要描述:
 根据用户的需求，帮助用户解决Excel相关问题，包括数据处理、公式应用、数据可视化、使用建议等。
 
 你必须使用上述格式输出结果。

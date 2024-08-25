@@ -95,7 +95,7 @@ class ElemUnstructuredLoader(BasePDFLoader):
         partitions = resp['partitions']
         if not partitions:
             logger.info(f'partition_error resp={resp}')
-        logger.info(f'unstruct_return code={resp.get("status_code")}')
+        logger.info(f'unstruct_return code={resp.get('status_code')}')
 
         content, metadata = merge_partitions(partitions)
         metadata['source'] = self.file_name

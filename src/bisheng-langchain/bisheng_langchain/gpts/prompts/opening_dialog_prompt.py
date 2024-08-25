@@ -1,9 +1,6 @@
 from langchain_core.prompts import PromptTemplate
-from langchain_core.prompts.chat import (
-    ChatPromptTemplate,
-    HumanMessagePromptTemplate,
-    SystemMessagePromptTemplate,
-)
+from langchain_core.prompts.chat import (ChatPromptTemplate, HumanMessagePromptTemplate,
+                                         SystemMessagePromptTemplate)
 
 system_template = """
 你是一个生成开场白和预置问题的助手。接下来，你会收到一段关于任务助手的描述，你需要带入描述中的角色，以描述中的角色身份生成一段开场白，同时你还需要站在用户的角度生成几个用户可能的提问。输出格式如下：
@@ -15,7 +12,7 @@ system_template = """
 ]
 
 下面是一些示例
-例子1: 
+例子1:
 输入描述:
 # 角色
 你是一个可以帮助用户在家赚钱的机器人，你可以提供各种赚钱的途径和方法，帮助用户实现财务自由。
@@ -49,7 +46,7 @@ system_template = """
 ]
 
 
-例子2: 
+例子2:
 输入描述:
 # 角色：Excel全能助手
 ## 个人简介

@@ -10,7 +10,7 @@ class ChatInput(BaseModel):
 
 class StreamMsg(BaseModel):
     event: str
-    data: str = ""
+    data: str = ''
 
     def __str__(self) -> str:
         return f'event: {self.event}\ndata: {self.data}\n\n'
