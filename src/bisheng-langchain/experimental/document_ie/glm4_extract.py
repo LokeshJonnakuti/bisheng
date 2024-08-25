@@ -199,7 +199,7 @@ def run_predict(ellm_data_dir, predict_scenes, sample_size=50):
 
         meta_data_path = scene_dir / 'meta.yaml'
         with open(meta_data_path, 'r') as f:
-            meta_data = yaml.load(f, Loader=yaml.FullLoader)
+            meta_data = yaml.load(f, Loader=yaml.SafeLoader)
         fields = meta_data['field_def']
         logger.warning(f"预估字段：{fields}")
 
