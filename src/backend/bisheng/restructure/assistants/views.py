@@ -1,9 +1,10 @@
 from uuid import uuid4
+
 from bisheng.database.models.assistant import AssistantDao, AssistantStatus
 from bisheng.restructure.assistants.agent import RtcAssistantAgent
-from bisheng.restructure.assistants.schemas import StreamMsg, ChatInput
-from bisheng.restructure.assistants.services import MsgCategory, MsgFrom, chat_by_agent, get_chat_history, \
-    record_message
+from bisheng.restructure.assistants.schemas import ChatInput, StreamMsg
+from bisheng.restructure.assistants.services import (MsgCategory, MsgFrom, chat_by_agent,
+                                                     get_chat_history, record_message)
 from bisheng.restructure.logger import log_trace
 from bisheng.utils.logger import logger
 from fastapi import APIRouter
@@ -27,10 +28,10 @@ async def chat(chat_input: ChatInput):
             yield str(StreamMsg(event='chat', data=chat_id))
         assistant = AssistantDao.get_one_assistant(chat_input.assistant_id)
         if not assistant:
-            yield str(StreamMsg(event='error', data="该助手已被删除"))
+            yield str(StreamMsg(event='error', data='该助手已被删除'))
             return
         if assistant.status != AssistantStatus.ONLINE.value:
-            yield str(StreamMsg(event='error', data="当前助手未上线，无法直接对话"))
+            yield str(StreamMsg(event='error', data='当前助手未上线，无法直接对话'))
             return
         record_message(chat_id, user_id, MsgFrom.Human, message, MsgCategory.Question)
         gpt_agent = await RtcAssistantAgent.create(assistant)

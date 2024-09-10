@@ -5,17 +5,16 @@ from pathlib import Path
 from typing import Dict, List
 
 import aiohttp
-from fastapi import Request, WebSocket
-from fastapi_jwt_auth import AuthJWT
-from platformdirs import user_cache_dir
-from sqlalchemy import delete
-from sqlmodel import select
-
 from bisheng.api.v1.schemas import StreamData
 from bisheng.database.base import session_getter
 from bisheng.database.models.variable_value import Variable
 from bisheng.graph.graph.base import Graph
 from bisheng.utils.logger import logger
+from fastapi import Request, WebSocket
+from fastapi_jwt_auth import AuthJWT
+from platformdirs import user_cache_dir
+from sqlalchemy import delete
+from sqlmodel import select
 
 API_WORDS = ['api', 'key', 'token']
 
@@ -192,7 +191,7 @@ async def build_flow_no_yield(graph_data: dict,
             if vertex.base_type == 'vectorstores':
                 # 注入user_name
                 vertex.params['user_name'] = kwargs.get('user_name') if kwargs else ''
-                if vertex.vertex_type not in ["MilvusWithPermissionCheck", "ElasticsearchWithPermissionCheck"]:
+                if vertex.vertex_type not in ['MilvusWithPermissionCheck', 'ElasticsearchWithPermissionCheck']:
                     # 知识库通过参数传参
                     if 'collection_name' in kwargs and 'collection_name' in vertex.params:
                         vertex.params['collection_name'] = kwargs['collection_name']

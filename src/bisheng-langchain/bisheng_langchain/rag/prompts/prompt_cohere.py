@@ -1,10 +1,6 @@
 from langchain_core.prompts import PromptTemplate
-from langchain_core.prompts.chat import (
-    ChatPromptTemplate,
-    HumanMessagePromptTemplate,
-    SystemMessagePromptTemplate,
-)
-
+from langchain_core.prompts.chat import (ChatPromptTemplate, HumanMessagePromptTemplate,
+                                         SystemMessagePromptTemplate)
 
 pirate_preamble = """
 ## Task & Context
@@ -19,7 +15,7 @@ pirate_preamble = """
 
 messages = [
     SystemMessagePromptTemplate.from_template(pirate_preamble),
-    HumanMessagePromptTemplate.from_template("{question}"),
+    HumanMessagePromptTemplate.from_template('{question}'),
 ]
 COHERE_CHAT_PROMPT = ChatPromptTemplate.from_messages(messages)
 
@@ -48,7 +44,7 @@ system_content = """## Task & Context
 Write 'Answer:' followed by a response to the user's last input. Use the retrieved documents to help you. Do not insert any citations or grounding markup.|<documents>|{documents}"""
 messages = [
     SystemMessagePromptTemplate.from_template(system_content),
-    HumanMessagePromptTemplate.from_template("{question}"),
+    HumanMessagePromptTemplate.from_template('{question}'),
 ]
 COHERE_LOCAL_CHAT_PROMPT_RAG = ChatPromptTemplate.from_messages(messages)
 
@@ -93,16 +89,16 @@ Unless the user asks for a different style of answer, you should answer in full 
 - 你需要根据上下文给出尽可能详细的回答；
 - Write 'Answer:' followed by a response to the user's last input. Use the retrieved documents to help you. <|END_OF_TURN_TOKEN|><|START_OF_TURN_TOKEN|><|CHATBOT_TOKEN|>"""
 COHERE_RAW_PROMPT = PromptTemplate(
-    template=prompt_template, input_variables=["documents", "question"]
+    template=prompt_template, input_variables=['documents', 'question']
 )
 
 
-# prompt_template = """<BOS_TOKEN><|START_OF_TURN_TOKEN|><|SYSTEM_TOKEN|>Use the following pieces of context to answer the question at the end. 
+# prompt_template = """<BOS_TOKEN><|START_OF_TURN_TOKEN|><|SYSTEM_TOKEN|>Use the following pieces of context to answer the question at the end.
 # If you don't know the answer, just say that you don't know, don't try to make up an answer.<results>
 # {documents}
 # </results><|END_OF_TURN_TOKEN|><|START_OF_TURN_TOKEN|><|USER_TOKEN|>{question}<|END_OF_TURN_TOKEN|><|START_OF_TURN_TOKEN|><|CHATBOT_TOKEN|>"""
 
-# # prompt_template = """<BOS_TOKEN><|START_OF_TURN_TOKEN|><|SYSTEM_TOKEN|>Use the following pieces of context to answer the question at the end. 
+# # prompt_template = """<BOS_TOKEN><|START_OF_TURN_TOKEN|><|SYSTEM_TOKEN|>Use the following pieces of context to answer the question at the end.
 # # If you don't know the answer, just say that you don't know, don't try to make up an answer.
 # # ----------------
 # # {documents}<|END_OF_TURN_TOKEN|><|START_OF_TURN_TOKEN|><|USER_TOKEN|>{question}<|END_OF_TURN_TOKEN|><|START_OF_TURN_TOKEN|><|CHATBOT_TOKEN|>"""

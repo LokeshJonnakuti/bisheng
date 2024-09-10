@@ -1,4 +1,4 @@
-ASSISTANT_PROMPT_DEFAULT = "You are a helpful assistant."
+ASSISTANT_PROMPT_DEFAULT = 'You are a helpful assistant.'
 
 # ASSISTANT_PROMPT_DEFAULT = """
 # # role

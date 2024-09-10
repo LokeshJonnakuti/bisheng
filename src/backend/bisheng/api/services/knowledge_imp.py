@@ -3,7 +3,7 @@ import json
 import math
 import re
 import time
-from typing import Dict, List, Any
+from typing import Any, Dict, List
 from uuid import uuid4
 
 import requests
@@ -12,17 +12,16 @@ from bisheng.database.base import session_getter
 from bisheng.database.models.knowledge import Knowledge, KnowledgeCreate, KnowledgeDao
 from bisheng.database.models.knowledge_file import KnowledgeFile, KnowledgeFileDao
 from bisheng.interface.embeddings.custom import FakeEmbedding
-from bisheng.interface.importing.utils import import_vectorstore
-from bisheng.interface.initialize.loading import instantiate_vectorstore, instantiate_llm
+from bisheng.interface.importing.utils import import_by_type, import_vectorstore
+from bisheng.interface.initialize.loading import instantiate_llm, instantiate_vectorstore
 from bisheng.settings import settings
 from bisheng.utils import minio_client
 from bisheng.utils.embedding import decide_embeddings
 from bisheng.utils.minio_client import MinioClient
-from bisheng.interface.importing.utils import import_by_type
 from bisheng_langchain.document_loaders import ElemUnstructuredLoader
+from bisheng_langchain.rag.extract_info import extract_title
 from bisheng_langchain.text_splitter import ElemCharacterTextSplitter
 from bisheng_langchain.vectorstores import ElasticKeywordsSearch
-from bisheng_langchain.rag.extract_info import extract_title
 from fastapi import HTTPException
 from langchain.embeddings.base import Embeddings
 from langchain.schema.document import Document
@@ -243,7 +242,7 @@ def addEmbedding(collection_name,
                  knowledge_files: List[KnowledgeFile],
                  callback: str,
                  extra_meta: str = None):
-    logger.info("start init Milvus")
+    logger.info('start init Milvus')
     error_msg = ''
     try:
         vectore_client, es_client = None, None
@@ -254,7 +253,7 @@ def addEmbedding(collection_name,
         error_msg = 'MilvusExcept:' + str(e)
         logger.exception(e)
 
-    logger.info("start init ElasticKeywordsSearch")
+    logger.info('start init ElasticKeywordsSearch')
     try:
         es_client = decide_vectorstores(index_name, 'ElasticKeywordsSearch', embeddings)
     except Exception as e:
@@ -388,7 +387,7 @@ def read_chunk_text(input_file, file_name, size, chunk_overlap, separator):
                 logger.error(f'file_pdf=not_success resp={resp.text}')
                 raise Exception(f'当前文件无法解析， {resp.text}')
             resp = resp.json()
-            if resp["status_code"] != 200:
+            if resp['status_code'] != 200:
                 logger.error(f'file_pdf=not_success resp={resp}')
                 raise Exception(f'当前文件无法解析， {resp}')
             b64_data = resp['b64_pdf']
@@ -424,7 +423,7 @@ def read_chunk_text(input_file, file_name, size, chunk_overlap, separator):
         texts = text_splitter.split_documents(documents)
         logger.info(f'file_split=success')
 
-        raw_texts = [t.metadata.get("source", '') + '\n' + t.metadata.get('title', '') + '\n' + t.page_content
+        raw_texts = [t.metadata.get('source', '') + '\n' + t.metadata.get('title', '') + '\n' + t.page_content
                      for t in texts]
         metadatas = [{
             'bbox': json.dumps({'chunk_bboxes': t.metadata.get('chunk_bboxes', '')}),

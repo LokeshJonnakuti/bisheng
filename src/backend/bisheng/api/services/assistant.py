@@ -2,11 +2,10 @@ from datetime import datetime
 from typing import Any, List, Optional
 from uuid import UUID
 
-from fastapi import Request
-
 from bisheng.api.errcode.assistant import (AssistantInitError, AssistantNameRepeatError,
-                                           AssistantNotEditError, AssistantNotExistsError, ToolTypeRepeatError,
-                                           ToolTypeEmptyError, ToolTypeNotExistsError, ToolTypeIsPresetError)
+                                           AssistantNotEditError, AssistantNotExistsError,
+                                           ToolTypeEmptyError, ToolTypeIsPresetError,
+                                           ToolTypeNotExistsError, ToolTypeRepeatError)
 from bisheng.api.errcode.base import UnAuthorizedError
 from bisheng.api.services.assistant_agent import AssistantAgent
 from bisheng.api.services.assistant_base import AssistantUtils
@@ -19,13 +18,15 @@ from bisheng.cache import InMemoryCache
 from bisheng.database.models.assistant import (Assistant, AssistantDao, AssistantLinkDao,
                                                AssistantStatus)
 from bisheng.database.models.flow import Flow, FlowDao
-from bisheng.database.models.gpts_tools import GptsToolsDao, GptsToolsRead, GptsToolsTypeRead, GptsTools
-from bisheng.database.models.group_resource import GroupResourceDao, GroupResource, ResourceTypeEnum
+from bisheng.database.models.gpts_tools import (GptsTools, GptsToolsDao, GptsToolsRead,
+                                                GptsToolsTypeRead)
+from bisheng.database.models.group_resource import GroupResource, GroupResourceDao, ResourceTypeEnum
 from bisheng.database.models.knowledge import KnowledgeDao
 from bisheng.database.models.role_access import AccessType, RoleAccessDao
 from bisheng.database.models.user import UserDao
 from bisheng.database.models.user_group import UserGroupDao
 from bisheng.database.models.user_role import UserRoleDao
+from fastapi import Request
 from loguru import logger
 
 
@@ -195,20 +196,20 @@ class AssistantService(AssistantUtils):
             yield str(StreamData(event='message', data={'type': 'prompt', 'message': one_prompt.content}))
             final_prompt += one_prompt.content
         assistant.prompt = final_prompt
-        yield str(StreamData(event='message', data={'type': 'end', 'message': ""}))
+        yield str(StreamData(event='message', data={'type': 'end', 'message': ''}))
 
         # 生成开场白和开场问题
         guide_info = auto_agent.generate_guide(assistant.prompt)
         yield str(StreamData(event='message', data={'type': 'guide_word', 'message': guide_info['opening_lines']}))
-        yield str(StreamData(event='message', data={'type': 'end', 'message': ""}))
+        yield str(StreamData(event='message', data={'type': 'end', 'message': ''}))
         yield str(StreamData(event='message', data={'type': 'guide_question', 'message': guide_info['questions']}))
-        yield str(StreamData(event='message', data={'type': 'end', 'message': ""}))
+        yield str(StreamData(event='message', data={'type': 'end', 'message': ''}))
 
         # 自动选择工具和技能
         tool_info = cls.get_auto_tool_info(assistant, auto_agent)
         tool_info = [one.model_dump() for one in tool_info]
         yield str(StreamData(event='message', data={'type': 'tool_list', 'message': tool_info}))
-        yield str(StreamData(event='message', data={'type': 'end', 'message': ""}))
+        yield str(StreamData(event='message', data={'type': 'end', 'message': ''}))
 
         flow_info = cls.get_auto_flow_info(assistant, auto_agent)
         flow_info = [one.model_dump() for one in flow_info]
@@ -363,7 +364,7 @@ class AssistantService(AssistantUtils):
             tool_type_children[one.type].append(one)
 
         for one in res:
-            one["children"] = tool_type_children.get(one["id"], [])
+            one['children'] = tool_type_children.get(one['id'], [])
 
         return res
 
@@ -372,7 +373,7 @@ class AssistantService(AssistantUtils):
         """ 添加自定义工具 """
         req.id = None
         if req.name.__len__() > 30 or req.name.__len__() == 0:
-            return resp_500(message="名字不符合规范：至少1个字符，不能超过30个字符")
+            return resp_500(message='名字不符合规范：至少1个字符，不能超过30个字符')
         # 判断类别是否已存在
         tool_type = GptsToolsDao.get_one_tool_type_by_name(user.user_id, req.name)
         if tool_type:
@@ -420,7 +421,7 @@ class AssistantService(AssistantUtils):
         if len(req.children) == 0:
             return ToolTypeEmptyError.return_resp()
         if req.name.__len__() > 30 or req.name.__len__() == 0:
-            return resp_500(message="名字不符合规范：最少一个字符，不能超过30个字符")
+            return resp_500(message='名字不符合规范：最少一个字符，不能超过30个字符')
 
         # 判断工具类别名称是否重复
         tool_type = GptsToolsDao.get_one_tool_type_by_name(user.user_id, req.name)
@@ -442,7 +443,7 @@ class AssistantService(AssistantUtils):
         children_map = {}
         for one in req.children:
             save_key = GptsToolsDao.get_tool_key(exist_tool_type.id, one.tool_key)
-            save_key_prefix = save_key.split("_")[0]
+            save_key_prefix = save_key.split('_')[0]
             if one.tool_key.startswith(save_key_prefix):
                 # 说明api和数据库的一致，没有通过openapiSchema重新解析
                 children_map[one.tool_key] = one

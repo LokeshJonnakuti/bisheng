@@ -1,4 +1,5 @@
-from bisheng.interface.vector_store.custom import MilvusWithPermissionCheck, ElasticsearchWithPermissionCheck
+from bisheng.interface.vector_store.custom import (ElasticsearchWithPermissionCheck,
+                                                   MilvusWithPermissionCheck)
 
 CUSTOM_VECTORSTORE = {
     'MilvusWithPermissionCheck': MilvusWithPermissionCheck,

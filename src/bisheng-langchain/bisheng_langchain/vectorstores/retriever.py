@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, ClassVar, Collection, Dict, List
 from venv import logger
+
 from langchain.schema.document import Document
 from langchain.vectorstores.base import VectorStore, VectorStoreRetriever
 from langchain_core.pydantic_v1 import Field, root_validator

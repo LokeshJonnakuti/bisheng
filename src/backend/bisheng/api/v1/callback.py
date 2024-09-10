@@ -494,7 +494,7 @@ class AsyncGptsDebugCallbackHandler(AsyncGptsLLMCallbackHandler):
         input_info = self.tool_cache.get(kwargs.get('run_id').hex)
         if input_info:
             output_info.update(input_info['input'])
-            intermediate_steps = f'{input_info["steps"]}\n\n{intermediate_steps}'
+            intermediate_steps = f'{input_info['steps']}\n\n{intermediate_steps}'
             ChatMessageDao.insert_one(
                 ChatMessageModel(is_bot=1,
                                  message=json.dumps(output_info),
@@ -531,7 +531,7 @@ class AsyncGptsDebugCallbackHandler(AsyncGptsLLMCallbackHandler):
                 ChatMessageModel(
                     is_bot=1,
                     message=json.dumps(output_info),
-                    intermediate_steps=f'{input_info["steps"]}\n\nTool output:\n\n  Error: ' +
+                    intermediate_steps=f'{input_info['steps']}\n\nTool output:\n\n  Error: ' +
                                        str(error),
                     category=tool_category,
                     type='end',

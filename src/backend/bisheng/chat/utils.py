@@ -138,7 +138,7 @@ async def process_source_document(source_document: List[Document], chat_id, mess
     keyword_conf = settings.get_default_llm() or {}
     llm = None
     if keyword_conf:
-        node_type = keyword_conf.pop('type', "HostQwenChat")  # 兼容旧配置
+        node_type = keyword_conf.pop('type', 'HostQwenChat')  # 兼容旧配置
         class_object = import_by_type(_type='llms', name=node_type)
         llm = instantiate_llm(node_type, class_object, keyword_conf)
 

@@ -166,6 +166,7 @@ import os
 import tempfile
 from pathlib import Path
 from urllib.parse import unquote, urlparse
+
 from bisheng.utils.minio_client import MinioClient
 from bisheng.utils.util import _is_valid_url
 from docx import Document
