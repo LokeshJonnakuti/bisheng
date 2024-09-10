@@ -1,4 +1,5 @@
 import requests
+from security import safe_requests
 
 ALL_NODE = {
     'chains': {
@@ -88,7 +89,7 @@ def test_build():
     requests.post(init_url, json=inp, headers=headers)
     build_url = 'http://127.0.0.1:7860/api/v1/build/stream/' + flow_id
 
-    resp = requests.get(url=build_url, headers=headers)
+    resp = safe_requests.get(url=build_url, headers=headers)
     resp
 
 

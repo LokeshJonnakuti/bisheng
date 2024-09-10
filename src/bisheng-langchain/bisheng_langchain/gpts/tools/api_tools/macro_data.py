@@ -8,6 +8,7 @@ from langchain.pydantic_v1 import BaseModel, Field
 from langchain_core.tools import BaseTool
 
 from .base import MultArgsSchemaTool
+from security import safe_requests
 
 
 class QueryArg(BaseModel):
@@ -80,7 +81,7 @@ class MacroData(BaseModel):
         """
         JS_CHINA_GDP_YEARLY_URL = 'https://cdn.jin10.com/dc/reports/dc_chinese_gdp_yoy_all.js?v={}&_={}'
         t = time.time()
-        r = requests.get(JS_CHINA_GDP_YEARLY_URL.format(str(int(round(t * 1000))), str(int(round(t * 1000)) + 90)))
+        r = safe_requests.get(JS_CHINA_GDP_YEARLY_URL.format(str(int(round(t * 1000))), str(int(round(t * 1000)) + 90)))
         json_data = json.loads(r.text[r.text.find('{'): r.text.rfind('}') + 1])
         date_list = [item['date'] for item in json_data['list']]
         value_list = [item['datas']['中国GDP年率报告'] for item in json_data['list']]
@@ -111,7 +112,7 @@ class MacroData(BaseModel):
             'x-csrf-token': '',
             'x-version': '1.0.0',
         }
-        r = requests.get(url, params=params, headers=headers)
+        r = safe_requests.get(url, params=params, headers=headers)
         temp_se = pd.DataFrame(r.json()['data']['values']).iloc[:, :2]
         temp_se.index = pd.to_datetime(temp_se.iloc[:, 0])
         temp_se = temp_se.iloc[:, 1]
@@ -149,7 +150,7 @@ class MacroData(BaseModel):
             'pageNum': '1',
             '_': '1669047266881',
         }
-        r = requests.get(url, params=params)
+        r = safe_requests.get(url, params=params)
         data_json = r.json()
         temp_df = pd.DataFrame(data_json['result']['data'])
         temp_df.columns = [
@@ -222,7 +223,7 @@ class MacroData(BaseModel):
             'pageNum': '1',
             '_': '1669047266881',
         }
-        r = requests.get(url, params=params)
+        r = safe_requests.get(url, params=params)
         data_json = r.json()
         temp_df = pd.DataFrame(data_json['result']['data'])
         temp_df.columns = [
@@ -269,7 +270,7 @@ class MacroData(BaseModel):
             "pageNum": "1",
             "_": "1669047266881",
         }
-        r = requests.get(url, params=params)
+        r = safe_requests.get(url, params=params)
         data_json = r.json()
         temp_df = pd.DataFrame(data_json["result"]["data"])
         temp_df.columns = [
@@ -326,7 +327,7 @@ M0数量（单位：亿元），M0 同比（单位：%），M0 环比（单位�
             'pageNum': '1',
             '_': '1669047266881',
         }
-        r = requests.get(url, params=params)
+        r = safe_requests.get(url, params=params)
         data_json = r.json()
         temp_df = pd.DataFrame(data_json['result']['data'])
         temp_df.columns = [
@@ -396,7 +397,7 @@ M0数量（单位：亿元），M0 同比（单位：%），M0 环比（单位�
             'pageNum': '1',
             '_': '1660718498421',
         }
-        r = requests.get(url, params=params, headers=headers)
+        r = safe_requests.get(url, params=params, headers=headers)
         data_json = r.json()
         temp_df = pd.DataFrame(data_json['result']['data'])
         temp_df.columns = [
@@ -449,7 +450,7 @@ M0数量（单位：亿元），M0 同比（单位：%），M0 环比（单位�
             "pageNum": "1",
             "_": "1615791534490",
         }
-        r = requests.get(url, params=params)
+        r = safe_requests.get(url, params=params)
         data_json = r.json()
         total_page = data_json["result"]["pages"]
         big_df = pd.DataFrame()
@@ -466,7 +467,7 @@ M0数量（单位：亿元），M0 同比（单位：%），M0 环比（单位�
                 "pageNum": page,
                 "_": "1615791534490",
             }
-            r = requests.get(url, params=params)
+            r = safe_requests.get(url, params=params)
             data_json = r.json()
             # 时间过滤
             if start_date and end_date:

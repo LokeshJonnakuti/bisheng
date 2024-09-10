@@ -2,11 +2,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, ClassVar, Collection, Dict, List
 from venv import logger
-
-import requests
 from langchain.schema.document import Document
 from langchain.vectorstores.base import VectorStore, VectorStoreRetriever
 from langchain_core.pydantic_v1 import Field, root_validator
+from security import safe_requests
 
 if TYPE_CHECKING:
     from langchain.callbacks.manager import (
@@ -80,7 +79,7 @@ class VectorStoreFilterRetriever(VectorStoreRetriever):
     def get_file_access(self, docs: List[Document]):
         file_ids = [doc.metadata.get('file_id') for doc in docs if 'file_id' in doc.metadata]
         if file_ids:
-            res = requests.get(self.access_url, json=file_ids)
+            res = safe_requests.get(self.access_url, json=file_ids)
             if res.status_code == 200:
                 doc_res = res.json().get('data') or []
                 doc_right = {doc.get('docid') for doc in doc_res if doc.get('result') == 1}

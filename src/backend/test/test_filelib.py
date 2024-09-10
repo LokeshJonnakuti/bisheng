@@ -2,6 +2,8 @@ import os
 import sys
 
 import requests
+from security import safe_requests
+
 # from bisheng.database.models.knowledge import KnowledgeCreate
 
 parent_dir = os.path.dirname(os.path.abspath(__file__)).replace('test', '')
@@ -12,7 +14,7 @@ url_host = 'http://{ip}:{port}/api'.format(ip='127.0.0.1', port=7860)
 
 
 def test_env():
-    requests.get(url_host / 'v1/env')
+    safe_requests.get(url_host / 'v1/env')
 
 
 def test_upload():

@@ -18,6 +18,7 @@ from bisheng.database.models.model_deploy import (ModelDeploy, ModelDeployDao, M
 from bisheng.database.models.server import Server, ServerCreate, ServerRead
 from bisheng.database.models.sft_model import SftModelDao
 from bisheng.utils.logger import logger
+from security import safe_requests
 
 # build router
 router = APIRouter(prefix='/server', tags=['server'], dependencies=[Depends(get_login_user)])
@@ -248,7 +249,7 @@ pattern = r'gpu_uuid="([^"]+)"'
 
 
 async def queryGPU(query_url: str):
-    resp = requests.get(query_url)
+    resp = safe_requests.get(query_url)
     if resp.status_code != 200:
         return []
     content = resp.text

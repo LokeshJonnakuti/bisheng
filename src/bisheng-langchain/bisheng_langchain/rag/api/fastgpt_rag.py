@@ -6,6 +6,7 @@ import json
 from config import FAST_GPT_API_KEY, FAST_GPT_APP_KEY, FAST_GPT_TOKEN
 from loguru import logger
 from tqdm import tqdm
+from security import safe_requests
 
 datasets = set()
 dataset = {}
@@ -27,7 +28,7 @@ def query_dataset_from_fastgpt():
         'Authorization': f'Bearer {FAST_GPT_API_KEY}', 
     }
     logger.debug(f'Starting to query dataset from fastgpt')
-    response = requests.get(url, headers=headers).json()
+    response = safe_requests.get(url, headers=headers).json()
     print(response)
     datasets = response['data']
         
@@ -74,7 +75,7 @@ def query_from_dataset(dataset_id):
     headers = {
         'Authorization': f'Bearer {FAST_GPT_API_KEY}',
     }
-    response = requests.get(url, headers=headers).json()
+    response = safe_requests.get(url, headers=headers).json()
     print(response)
 
 def query_file_from_dataset(dataset_id):

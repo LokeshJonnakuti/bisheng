@@ -16,6 +16,7 @@ from langchain.schema.messages import (AIMessage, BaseMessage, ChatMessage, Func
 from langchain.utils import get_from_dict_or_env
 from langchain_core.language_models.llms import create_base_retry_decorator
 from langchain_core.pydantic_v1 import Field, root_validator
+from security import safe_requests
 
 # from requests.exceptions import HTTPError
 
@@ -152,7 +153,7 @@ class BaseHostChatLLM(BaseChatModel):
             if cls != CustomLLMChat:
                 url = values['host_base_url'].rsplit('/', 2)[0]
                 config_ep = f'{url}/v2/models/{model}/config'
-                config = requests.get(url=config_ep, json={}, timeout=5).json()
+                config = safe_requests.get(url=config_ep, json={}, timeout=5).json()
                 policy = config.get('model_transaction_policy', {})
                 values['decoupled'] = policy.get('decoupled', False)
                 # Host class should set below code

@@ -166,11 +166,10 @@ import os
 import tempfile
 from pathlib import Path
 from urllib.parse import unquote, urlparse
-
-import requests
 from bisheng.utils.minio_client import MinioClient
 from bisheng.utils.util import _is_valid_url
 from docx import Document
+from security import safe_requests
 
 
 def find_lcs(str1, str2):
@@ -274,7 +273,7 @@ class DocxTemplateRender(object):
 def test_replace_string(template_file, kv_dict: dict, file_name: str):
     # If the file is a web path, download it to a temporary file, and use that
     if not os.path.isfile(template_file) and _is_valid_url(template_file):
-        r = requests.get(template_file)
+        r = safe_requests.get(template_file)
 
         if r.status_code != 200:
             raise ValueError(

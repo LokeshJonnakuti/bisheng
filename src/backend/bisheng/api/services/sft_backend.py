@@ -1,6 +1,7 @@
 from typing import Dict
 
 import requests
+from security import safe_requests
 
 
 class SFTBackend:
@@ -123,5 +124,5 @@ class SFTBackend:
     def get_gpu_info(cls, host) -> (bool, str):
         """ 获取GPU信息 """
         url = '/v2.1/sft/gpu'
-        res = requests.get(f'{host}{url}')
+        res = safe_requests.get(f'{host}{url}')
         return cls.handle_response(res)

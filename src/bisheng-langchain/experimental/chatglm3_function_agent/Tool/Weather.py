@@ -1,8 +1,7 @@
 import os
 from typing import Any
-
-import requests
 from langchain.tools import BaseTool
+from security import safe_requests
 
 
 class Weather(BaseTool):
@@ -19,7 +18,7 @@ class Weather(BaseTool):
     def get_weather(self, location):
         api_key = os.environ["SENIVERSE_KEY"]
         url = f"https://api.seniverse.com/v3/weather/now.json?key={api_key}&location={location}&language=zh-Hans&unit=c"
-        response = requests.get(url)
+        response = safe_requests.get(url)
         if response.status_code == 200:
             data = response.json()
             weather = {

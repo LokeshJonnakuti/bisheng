@@ -12,10 +12,10 @@ from typing import Any, Dict
 from urllib.parse import unquote, urlparse
 
 import cchardet
-import requests
 from appdirs import user_cache_dir
 from bisheng.settings import settings
 from bisheng.utils.minio_client import MinioClient, tmp_bucket
+from security import safe_requests
 
 CACHE: Dict[str, Any] = {}
 
@@ -262,7 +262,7 @@ def save_download_file(file_byte, folder_name, filename):
 def file_download(file_path: str):
     """download file and return path"""
     if not os.path.isfile(file_path) and _is_valid_url(file_path):
-        r = requests.get(file_path, verify=False)
+        r = safe_requests.get(file_path, verify=False)
 
         if r.status_code != 200:
             raise ValueError('Check the url of your file; returned status code %s' % r.status_code)

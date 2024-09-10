@@ -6,6 +6,7 @@ import aiohttp
 import requests
 from loguru import logger
 from pydantic import BaseModel, Extra
+from security import safe_requests
 
 
 class Requests(BaseModel):
@@ -28,7 +29,7 @@ class Requests(BaseModel):
 
     def get(self, url: str, **kwargs: Any) -> requests.Response:
         """GET the URL and return the text."""
-        return requests.get(url,
+        return safe_requests.get(url,
                             headers=self.headers,
                             auth=self.auth,
                             timeout=self.request_timeout,

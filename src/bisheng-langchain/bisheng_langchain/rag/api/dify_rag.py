@@ -6,6 +6,7 @@ import json
 from config import API_KEY, DATASET_API, DIFY_TOKEN
 from loguru import logger
 import tqdm
+from security import safe_requests
 
 datasets = set()
 dataset = {}
@@ -25,7 +26,7 @@ def query_dataset_from_dify():
     headers = {
         'Authorization': f'Bearer {DATASET_API}', 
     }
-    response = requests.get(url, headers=headers).json()
+    response = safe_requests.get(url, headers=headers).json()
     datasets = response['data']
     print(datasets)
     
@@ -55,7 +56,7 @@ def query_file_from_dataset(dataset_id):
     headers = {
         'Authorization': f'Bearer {DATASET_API}',
     }
-    response = requests.get(url, headers=headers).json()
+    response = safe_requests.get(url, headers=headers).json()
     print(response)
     
     files = response['data']
