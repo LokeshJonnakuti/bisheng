@@ -3,25 +3,9 @@ import os
 import time
 import uuid
 from pathlib import Path
-from typing import Dict, List, Any
+from typing import Any, Dict, List
 from uuid import UUID
 
-from langchain_core.callbacks import Callbacks
-from langchain_core.language_models import BaseLanguageModel
-from langchain_core.messages import AIMessage, HumanMessage
-from langchain_core.runnables import RunnableConfig
-from langchain_core.tools import BaseTool, Tool
-from langchain_core.utils.function_calling import format_tool_to_openai_tool
-from loguru import logger
-
-from bisheng_langchain.gpts.tools.api_tools.openapi import OpenApiTools
-from bisheng_langchain.gpts.assistant import ConfigurableAssistant
-from bisheng_langchain.gpts.auto_optimization import (generate_breif_description,
-                                                      generate_opening_dialog,
-                                                      optimize_assistant_prompt)
-from bisheng_langchain.gpts.auto_tool_selected import ToolInfo, ToolSelector
-from bisheng_langchain.gpts.load_tools import load_tools
-from bisheng_langchain.gpts.prompts import ASSISTANT_PROMPT_OPT
 from bisheng.api.services.assistant_base import AssistantUtils
 from bisheng.api.services.knowledge_imp import decide_vectorstores
 from bisheng.api.services.openapi import OpenApiSchema
@@ -29,10 +13,25 @@ from bisheng.api.utils import build_flow_no_yield
 from bisheng.api.v1.schemas import InputRequest
 from bisheng.database.models.assistant import Assistant, AssistantLink, AssistantLinkDao
 from bisheng.database.models.flow import FlowDao, FlowStatus
-from bisheng.database.models.gpts_tools import GptsTools, GptsToolsDao, GptsToolsType, AuthMethod
-from bisheng.database.models.knowledge import KnowledgeDao, Knowledge
-from bisheng.interface.initialize.loading import instantiate_llm, import_by_type
+from bisheng.database.models.gpts_tools import AuthMethod, GptsTools, GptsToolsDao, GptsToolsType
+from bisheng.database.models.knowledge import Knowledge, KnowledgeDao
+from bisheng.interface.initialize.loading import import_by_type, instantiate_llm
 from bisheng.utils.embedding import decide_embeddings
+from bisheng_langchain.gpts.assistant import ConfigurableAssistant
+from bisheng_langchain.gpts.auto_optimization import (generate_breif_description,
+                                                      generate_opening_dialog,
+                                                      optimize_assistant_prompt)
+from bisheng_langchain.gpts.auto_tool_selected import ToolInfo, ToolSelector
+from bisheng_langchain.gpts.load_tools import load_tools
+from bisheng_langchain.gpts.prompts import ASSISTANT_PROMPT_OPT
+from bisheng_langchain.gpts.tools.api_tools.openapi import OpenApiTools
+from langchain_core.callbacks import Callbacks
+from langchain_core.language_models import BaseLanguageModel
+from langchain_core.messages import AIMessage, HumanMessage
+from langchain_core.runnables import RunnableConfig
+from langchain_core.tools import BaseTool, Tool
+from langchain_core.utils.function_calling import format_tool_to_openai_tool
+from loguru import logger
 
 
 class AssistantAgent(AssistantUtils):
@@ -50,7 +49,7 @@ class AssistantAgent(AssistantUtils):
     Finally, Write 'Grounded answer:' followed by a response to the user's last input in high quality natural english. Use the symbols <co: doc> and </co: doc> to indicate when a fact comes from a document in the search result, e.g <co: 4>my fact</co: 4> for a fact from document 4.
 
     Additional instructions to note:
-    - If the user's question is in Chinese, please answer it in Chinese. 
+    - If the user's question is in Chinese, please answer it in Chinese.
     - 当问题中有涉及到时间信息时，比如最近6个月、昨天、去年等，你需要用时间工具查询时间信息。
     """
 
@@ -71,8 +70,8 @@ class AssistantAgent(AssistantUtils):
         self.knowledge_skill_data = None
         # 知识库检索相关参数
         self.knowledge_retrive = {
-            "max_content": 15000,
-            "sort_by_source_and_index": False
+            'max_content': 15000,
+            'sort_by_source_and_index': False
         }
 
     async def init_assistant(self, callbacks: Callbacks = None):
@@ -173,12 +172,12 @@ class AssistantAgent(AssistantUtils):
         vector_client = decide_vectorstores(knowledge.collection_name, 'Milvus', embeddings)
         es_vector_client = decide_vectorstores(knowledge.index_name, 'ElasticKeywordsSearch', embeddings)
         tool_params = {
-            "bisheng_rag": {
-                "name": f"knowledge_{knowledge.id}",
-                "description": f"{knowledge.name}:{knowledge.description}",
-                "vector_store": vector_client,
-                "keyword_store": es_vector_client,
-                "llm": self.llm
+            'bisheng_rag': {
+                'name': f"knowledge_{knowledge.id}",
+                'description': f"{knowledge.name}:{knowledge.description}",
+                'vector_store': vector_client,
+                'keyword_store': es_vector_client,
+                'llm': self.llm
             }
         }
         tool_params['bisheng_rag'].update(self.knowledge_retrive)
@@ -278,7 +277,7 @@ class AssistantAgent(AssistantUtils):
         agent_executor_type = self.agent_executor_dict.get(agent_executor_type, agent_executor_type)
 
         prompt = self.assistant.prompt
-        if self.assistant.model_name.startswith("command-r"):
+        if self.assistant.model_name.startswith('command-r'):
             prompt = self.ASSISTANT_PROMPT_COHERE.format(preamble=prompt)
 
         # 初始化agent
@@ -338,15 +337,15 @@ class AssistantAgent(AssistantUtils):
 
     async def record_chat_history(self, message: List[Any]):
         # 记录助手的聊天历史
-        if not os.getenv("BISHENG_RECORD_HISTORY"):
+        if not os.getenv('BISHENG_RECORD_HISTORY'):
             return
         try:
-            os.makedirs("/app/data/history", exist_ok=True)
-            with open(f"/app/data/history/{self.assistant.id}_{time.time()}.json", "w", encoding="utf-8") as f:
+            os.makedirs('/app/data/history', exist_ok=True)
+            with open(f"/app/data/history/{self.assistant.id}_{time.time()}.json", 'w', encoding='utf-8') as f:
                 json.dump({
-                    "system": self.assistant.prompt,
-                    "message": message,
-                    "tools": [format_tool_to_openai_tool(t) for t in self.tools]
+                    'system': self.assistant.prompt,
+                    'message': message,
+                    'tools': [format_tool_to_openai_tool(t) for t in self.tools]
                 }, f, ensure_ascii=False)
         except Exception as e:
             logger.error(f"record assistant history error: {str(e)}")

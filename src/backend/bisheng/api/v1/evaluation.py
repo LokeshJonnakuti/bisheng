@@ -1,14 +1,15 @@
-import json
 import io
+import json
 from typing import List, Optional
-from bisheng.api.v1.schemas import UnifiedResponseModel, resp_200, resp_500
-from bisheng.database.base import session_getter
+
 from bisheng.api.services.evaluation import EvaluationService, add_evaluation_task
 from bisheng.api.services.user_service import UserPayload, get_login_user
-from fastapi_jwt_auth import AuthJWT
-from fastapi import APIRouter, Depends, Query, UploadFile, Form, BackgroundTasks
-from bisheng.database.models.evaluation import EvaluationRead, EvaluationCreate, Evaluation
+from bisheng.api.v1.schemas import UnifiedResponseModel, resp_200, resp_500
+from bisheng.database.base import session_getter
+from bisheng.database.models.evaluation import Evaluation, EvaluationCreate, EvaluationRead
 from bisheng.utils.minio_client import MinioClient
+from fastapi import APIRouter, BackgroundTasks, Depends, Form, Query, UploadFile
+from fastapi_jwt_auth import AuthJWT
 
 router = APIRouter(prefix='/evaluation', tags=['Skills'], dependencies=[Depends(get_login_user)])
 

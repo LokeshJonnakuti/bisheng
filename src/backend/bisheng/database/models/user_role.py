@@ -3,11 +3,10 @@ from typing import List, Optional
 
 from bisheng.database.base import session_getter
 from bisheng.database.models.base import SQLModelSerializable
-from pydantic import BaseModel
-from sqlalchemy import Column, DateTime, text, delete
-from sqlmodel import Field, select
-
 from bisheng.database.models.role import AdminRole
+from pydantic import BaseModel
+from sqlalchemy import Column, DateTime, delete, text
+from sqlmodel import Field, select
 
 
 class UserRoleBase(SQLModelSerializable):

@@ -3,27 +3,25 @@
 from datetime import datetime
 from typing import Dict, List, Optional
 
-from sqlalchemy import func
-
 from bisheng.database.base import session_getter
 from bisheng.database.models.base import SQLModelSerializable
+from bisheng.database.models.flow import Flow
 # if TYPE_CHECKING:
 from pydantic import validator
-from sqlmodel import JSON, Field, select, update, text, Column, DateTime
-
-from bisheng.database.models.flow import Flow
+from sqlalchemy import func
+from sqlmodel import JSON, Column, DateTime, Field, select, text, update
 
 
 class FlowVersionBase(SQLModelSerializable):
     id: Optional[int] = Field(default=None, primary_key=True, unique=True)
-    flow_id: str = Field(index=True, max_length=32, description="所属的技能ID")
-    name: str = Field(index=True, description="版本的名字")
-    data: Optional[Dict] = Field(default=None, description="版本的数据")
-    description: Optional[str] = Field(index=False, description="版本的描述")
-    user_id: Optional[int] = Field(index=True, description="创建者")
-    is_current: Optional[int] = Field(default=0, description="是否为正在使用版本")
-    is_delete: Optional[int] = Field(default=0, description="是否删除")
-    original_version_id: Optional[int] = Field(default=None, description="来源版本的ID")
+    flow_id: str = Field(index=True, max_length=32, description='所属的技能ID')
+    name: str = Field(index=True, description='版本的名字')
+    data: Optional[Dict] = Field(default=None, description='版本的数据')
+    description: Optional[str] = Field(index=False, description='版本的描述')
+    user_id: Optional[int] = Field(index=True, description='创建者')
+    is_current: Optional[int] = Field(default=0, description='是否为正在使用版本')
+    is_delete: Optional[int] = Field(default=0, description='是否删除')
+    original_version_id: Optional[int] = Field(default=None, description='来源版本的ID')
     create_time: Optional[datetime] = Field(sa_column=Column(
         DateTime, nullable=False, index=True, server_default=text('CURRENT_TIMESTAMP')))
     update_time: Optional[datetime] = Field(sa_column=Column(
@@ -46,7 +44,7 @@ class FlowVersionBase(SQLModelSerializable):
 
 
 class FlowVersion(FlowVersionBase, table=True):
-    data: Optional[Dict] = Field(default=None, sa_column=Column(JSON), description="版本的数据")
+    data: Optional[Dict] = Field(default=None, sa_column=Column(JSON), description='版本的数据')
 
 
 class FlowVersionRead(FlowVersionBase):

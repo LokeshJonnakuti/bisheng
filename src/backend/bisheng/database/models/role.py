@@ -3,7 +3,7 @@ from typing import List, Optional
 
 from bisheng.database.base import session_getter
 from bisheng.database.models.base import SQLModelSerializable
-from sqlalchemy import Column, DateTime, text, func, delete, and_, UniqueConstraint
+from sqlalchemy import Column, DateTime, UniqueConstraint, and_, delete, func, text
 from sqlmodel import Field, select
 
 # 默认普通用户角色的ID

@@ -1,17 +1,19 @@
-import os
-import openai
-import httpx
-import time
 import json
+import os
 import shutil
-import pandas as pd
-from tqdm import tqdm
+import time
 from collections import defaultdict
+
+import httpx
+import openai
+import pandas as pd
 from openai import OpenAI
+from tqdm import tqdm
+
 thread_ids = set()
 
 
-client = OpenAI(api_key=os.environ.get('OPENAI_API_KEY', ''), 
+client = OpenAI(api_key=os.environ.get('OPENAI_API_KEY', ''),
                 http_client=httpx.Client(proxies=os.environ.get('OPENAI_PROXY', '')))
 
 
@@ -26,15 +28,15 @@ def upload_files(data_folder, excel_file, save_excel_file):
             value = row[column]
             question_info[column] = value
         all_questions_info.append(question_info)
-    
+
     file2collection = dict()
     for questions_info in tqdm(all_questions_info):
         file_name = questions_info['文件名']
         if file_name not in file2collection:
             pdf_file = os.path.join(data_folder, file_name)
             response = client.files.create(
-                file=open(pdf_file, "rb"),
-                purpose="assistants"
+                file=open(pdf_file, 'rb'),
+                purpose='assistants'
             )
             file_id = response.id
             file2collection[file_name] = file_id
@@ -59,7 +61,7 @@ def question_answer(excel_file):
             value = row[column]
             question_info[column] = value
         all_questions_info.append(question_info)
-    
+
     file2assistant = dict()
     for questions_info in tqdm(all_questions_info):
         question = questions_info['问题']
@@ -67,9 +69,9 @@ def question_answer(excel_file):
         if file_id not in file2assistant:
             assistant = client.beta.assistants.create(
                 name='文档问答系统',
-                instructions="根据上传的文档，回答相关的问题.",
-                model="gpt-4-1106-preview",
-                tools=[{"type": "retrieval"}],
+                instructions='根据上传的文档，回答相关的问题.',
+                model='gpt-4-1106-preview',
+                tools=[{'type': 'retrieval'}],
                 file_ids=[file_id]
             )
             file2assistant[file_id] = assistant
@@ -80,10 +82,10 @@ def question_answer(excel_file):
         while (thread.id in thread_ids):
             thread = client.beta.threads.create()
         thread_ids.add(thread.id)
-        
+
         message = client.beta.threads.messages.create(
             thread_id=thread.id,
-            role="user",
+            role='user',
             content=question
         )
         run = client.beta.threads.runs.create(
@@ -101,7 +103,7 @@ def question_answer(excel_file):
             )
             print(run.status)
             time.sleep(1)
-    
+
         # print(run)
         messages = client.beta.threads.messages.list(thread_id=thread.id)
         ans = messages.data[0].content[0].text.value
@@ -109,7 +111,7 @@ def question_answer(excel_file):
         print('query:', question)
         print('pred:', ans)
         print('--------------------------------------')
-    
+
     # save excel
     df = pd.DataFrame(all_questions_info)
     df.to_excel(excel_file, index=False)

@@ -1,9 +1,8 @@
-from langchain_core.messages import AIMessage, HumanMessage
-
 from bisheng.database.models.message import ChatMessage, ChatMessageDao
 from bisheng.restructure.assistants.agent import RtcAssistantAgent
 from bisheng.settings import settings
 from bisheng.utils.logger import logger
+from langchain_core.messages import AIMessage, HumanMessage
 
 DEFAULT_SIZE = 20
 
@@ -42,8 +41,8 @@ async def chat_by_agent(agent: RtcAssistantAgent, message: str, chat_history: li
     # todo: 后续优化代码解释器的实现方案，保证输出的文件可以公开访问
     # 获取minio的share地址，把share域名去掉, 为毕昇的部署方案特殊处理下
     if gpts_tool_conf := settings.get_from_db('gpts').get('tools'):
-        if bisheng_code_conf := gpts_tool_conf.get("bisheng_code_interpreter"):
-            answer = answer.replace(f"http://{bisheng_code_conf['minio']['MINIO_SHAREPOIN']}", "")
+        if bisheng_code_conf := gpts_tool_conf.get('bisheng_code_interpreter'):
+            answer = answer.replace(f"http://{bisheng_code_conf['minio']['MINIO_SHAREPOIN']}", '')
     return answer
 
 
