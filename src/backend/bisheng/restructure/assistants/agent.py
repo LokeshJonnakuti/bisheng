@@ -1,10 +1,6 @@
 import typing as tp
 from pathlib import Path
 
-from langchain_core.messages import AIMessage
-from langchain_core.runnables import RunnableConfig
-from langchain_core.tools import BaseTool, Tool
-
 from bisheng.api.services.assistant_agent import AssistantAgent
 from bisheng.api.utils import build_flow_no_yield
 from bisheng.api.v1.schemas import InputRequest
@@ -15,6 +11,9 @@ from bisheng.database.models.flow import FlowDao, FlowStatus
 from bisheng.database.models.gpts_tools import GptsTools, GptsToolsDao
 from bisheng.database.models.knowledge import KnowledgeDao
 from bisheng.utils.logger import logger
+from langchain_core.messages import AIMessage
+from langchain_core.runnables import RunnableConfig
+from langchain_core.tools import BaseTool, Tool
 
 
 class RtcAssistantAgent(AssistantAgent):
@@ -30,7 +29,7 @@ class RtcAssistantAgent(AssistantAgent):
         await self.init_agent()
 
     @classmethod
-    async def create(cls, assistant: Assistant) -> "RtcAssistantAgent":
+    async def create(cls, assistant: Assistant) -> 'RtcAssistantAgent':
         if ins := cls.load(assistant.id.hex):
             return ins
         else:
@@ -142,4 +141,4 @@ class RtcAssistantAgent(AssistantAgent):
         # result包含了history，最后一个是最后一次回答
         if isinstance(result[-1], AIMessage):
             return result[-1].content
-        return ""
+        return ''

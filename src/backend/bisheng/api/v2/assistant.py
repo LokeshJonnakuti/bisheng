@@ -4,22 +4,21 @@ import uuid
 from typing import Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Request, HTTPException, WebSocket, WebSocketException
-from fastapi import status as http_status
-from fastapi.responses import StreamingResponse, ORJSONResponse
-from langchain_core.messages import HumanMessage, AIMessage
-from loguru import logger
-
 from bisheng.api.services.assistant import AssistantService
 from bisheng.api.services.assistant_agent import AssistantAgent
 from bisheng.api.services.user_service import UserPayload
 from bisheng.api.utils import get_request_ip
 from bisheng.api.v1.chat import chat_manager
-from bisheng.api.v1.schemas import OpenAIChatCompletionResp, OpenAIChatCompletionReq, UnifiedResponseModel, \
-    AssistantInfo, OpenAIChoice
+from bisheng.api.v1.schemas import (AssistantInfo, OpenAIChatCompletionReq,
+                                    OpenAIChatCompletionResp, OpenAIChoice, UnifiedResponseModel)
 from bisheng.chat.types import WorkType
 from bisheng.database.models.user import UserDao
 from bisheng.settings import settings
+from fastapi import APIRouter, HTTPException, Request, WebSocket, WebSocketException
+from fastapi import status as http_status
+from fastapi.responses import ORJSONResponse, StreamingResponse
+from langchain_core.messages import AIMessage, HumanMessage
+from loguru import logger
 
 router = APIRouter(prefix='/assistant', tags=['AssistantOpenApi'])
 

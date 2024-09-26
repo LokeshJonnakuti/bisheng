@@ -17,14 +17,15 @@ import matplotlib
 from langchain_community.tools import Tool
 from langchain_core.pydantic_v1 import BaseModel, Field
 from loguru import logger
+from security import safe_command
 
-CODE_BLOCK_PATTERN = r"```(\w*)\n(.*?)\n```"
+CODE_BLOCK_PATTERN = r'```(\w*)\n(.*?)\n```'
 DEFAULT_TIMEOUT = 600
 WIN32 = sys.platform == 'win32'
 PATH_SEPARATOR = WIN32 and '\\' or '/'
 WORKING_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'extensions')
 TIMEOUT_MSG = 'Timeout'
-UNKNOWN = "unknown"
+UNKNOWN = 'unknown'
 
 
 def _cmd(lang):
@@ -41,13 +42,13 @@ def infer_lang(code):
     """infer the language for the code.
     TODO: make it robust.
     """
-    if code.startswith("python ") or code.startswith("pip") or code.startswith("python3 "):
-        return "sh"
+    if code.startswith('python ') or code.startswith('pip') or code.startswith('python3 '):
+        return 'sh'
 
     # check if code is a valid python code
     try:
-        compile(code, "test", "exec")
-        return "python"
+        compile(code, 'test', 'exec')
+        return 'python'
     except SyntaxError:
         # not a valid python code
         return UNKNOWN
@@ -78,7 +79,7 @@ def extract_code(
     # `{3}(\w+)?\s*([\s\S]*?)`{3}: Matches multi-line code blocks.
     #    The (\w+)? matches the language, where the ? indicates it is optional.
     # `([^`]+)`: Matches inline code.
-    code_pattern = re.compile(r"`{3}(\w+)?\s*([\s\S]*?)`{3}|`([^`]+)`")
+    code_pattern = re.compile(r'`{3}(\w+)?\s*([\s\S]*?)`{3}|`([^`]+)`')
     code_blocks = code_pattern.findall(text)
 
     # Extract the individual code blocks and languages from the matched groups
@@ -87,7 +88,7 @@ def extract_code(
         if group1:
             extracted.append((lang.strip(), group1.strip()))
         elif group2:
-            extracted.append(("", group2.strip()))
+            extracted.append(('', group2.strip()))
 
     return extracted
 
@@ -127,8 +128,7 @@ def execute_code(
     ]
     if WIN32:
         logger.warning('SIGALRM is not supported on Windows. No timeout will be enforced.')
-        result = subprocess.run(
-            cmd,
+        result = safe_command.run(subprocess.run, cmd,
             cwd=work_dir,
             capture_output=True,
             text=True,

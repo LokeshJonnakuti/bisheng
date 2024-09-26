@@ -3,22 +3,15 @@ import time
 from typing import List, Optional
 from uuid import UUID
 
-from fastapi import APIRouter, HTTPException, Query, WebSocket, WebSocketException, status, Body, Request
-from fastapi.params import Depends
-from fastapi.responses import StreamingResponse
-from fastapi_jwt_auth import AuthJWT
-from sqlalchemy import func
-from sqlmodel import select
-
 from bisheng.api.services.assistant import AssistantService
 from bisheng.api.services.audit_log import AuditLogService
 from bisheng.api.services.chat_imp import comment_answer
 from bisheng.api.services.knowledge_imp import delete_es, delete_vector
 from bisheng.api.services.user_service import UserPayload, get_login_user
 from bisheng.api.utils import build_flow, build_input_keys_response, get_request_ip
-from bisheng.api.v1.schemas import (BuildStatus, BuiltResponse, ChatInput, ChatList,
-                                    FlowGptsOnlineList, InitResponse, StreamData,
-                                    UnifiedResponseModel, resp_200, AddChatMessages)
+from bisheng.api.v1.schemas import (AddChatMessages, BuildStatus, BuiltResponse, ChatInput,
+                                    ChatList, FlowGptsOnlineList, InitResponse, StreamData,
+                                    UnifiedResponseModel, resp_200)
 from bisheng.cache.redis import redis_client
 from bisheng.chat.manager import ChatManager
 from bisheng.database.base import session_getter
@@ -29,6 +22,13 @@ from bisheng.database.models.message import ChatMessage, ChatMessageDao, ChatMes
 from bisheng.graph.graph.base import Graph
 from bisheng.utils.logger import logger
 from bisheng.utils.util import get_cache_key
+from fastapi import (APIRouter, Body, HTTPException, Query, Request, WebSocket, WebSocketException,
+                     status)
+from fastapi.params import Depends
+from fastapi.responses import StreamingResponse
+from fastapi_jwt_auth import AuthJWT
+from sqlalchemy import func
+from sqlmodel import select
 
 router = APIRouter(tags=['Chat'])
 chat_manager = ChatManager()

@@ -1,11 +1,10 @@
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import Column, DateTime, text, Text
-from sqlmodel import Field, select
-
-from bisheng.database.models.base import SQLModelSerializable
 from bisheng.database.base import session_getter
+from bisheng.database.models.base import SQLModelSerializable
+from sqlalchemy import Column, DateTime, Text, text
+from sqlmodel import Field, select
 
 
 class ConfigBase(SQLModelSerializable):

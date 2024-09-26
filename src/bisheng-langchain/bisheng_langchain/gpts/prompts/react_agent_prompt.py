@@ -1,13 +1,10 @@
 from typing import List, Union
-from langchain_core.prompts.chat import (
-    ChatPromptTemplate,
-    HumanMessagePromptTemplate,
-    SystemMessagePromptTemplate,
-    MessagesPlaceholder
-)
-from langchain_core.prompts.prompt import PromptTemplate
-from langchain_core.messages import FunctionMessage, SystemMessage, ToolMessage, AIMessage, HumanMessage, ChatMessage
 
+from langchain_core.messages import (AIMessage, ChatMessage, FunctionMessage, HumanMessage,
+                                     SystemMessage, ToolMessage)
+from langchain_core.prompts.chat import (ChatPromptTemplate, HumanMessagePromptTemplate,
+                                         MessagesPlaceholder, SystemMessagePromptTemplate)
+from langchain_core.prompts.prompt import PromptTemplate
 
 system_temp = """
 {assistant_message}
@@ -57,12 +54,12 @@ Thought: {agent_scratchpad}
 
 
 react_agent_prompt = ChatPromptTemplate(
-    input_variables=['agent_scratchpad', 'input', 'tool_names', 'tools', 'assistant_message'], 
-    optional_variables=['chat_history'], 
-    input_types={'chat_history': List[Union[AIMessage, HumanMessage, ChatMessage, SystemMessage, FunctionMessage, ToolMessage]]}, 
+    input_variables=['agent_scratchpad', 'input', 'tool_names', 'tools', 'assistant_message'],
+    optional_variables=['chat_history'],
+    input_types={'chat_history': List[Union[AIMessage, HumanMessage, ChatMessage, SystemMessage, FunctionMessage, ToolMessage]]},
     messages=[
         SystemMessagePromptTemplate.from_template(system_temp),
-        MessagesPlaceholder(variable_name='chat_history', optional=True), 
+        MessagesPlaceholder(variable_name='chat_history', optional=True),
         HumanMessagePromptTemplate.from_template(human_temp)
     ]
 )
