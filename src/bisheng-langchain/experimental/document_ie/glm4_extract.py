@@ -13,6 +13,7 @@ import yaml
 import zhipu
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from tqdm import tqdm
+from security import safe_command
 
 random.seed(2024)
 import re
@@ -244,8 +245,7 @@ def score(data_dir, score_script_path, scenes):
         output_path = scene
 
         cmd = f"python {score_script_path} --datadir {label_path} --preddir {pred_path} --savedir {output_path} --exclude_keys ''"
-        score_result = subprocess.run(
-            cmd,
+        score_result = safe_command.run(subprocess.run, cmd,
             shell=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,

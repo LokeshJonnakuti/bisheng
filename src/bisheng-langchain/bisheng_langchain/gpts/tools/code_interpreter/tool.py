@@ -17,6 +17,7 @@ import matplotlib
 from langchain_community.tools import Tool
 from langchain_core.pydantic_v1 import BaseModel, Field
 from loguru import logger
+from security import safe_command
 
 CODE_BLOCK_PATTERN = r"```(\w*)\n(.*?)\n```"
 DEFAULT_TIMEOUT = 600
@@ -127,8 +128,7 @@ def execute_code(
     ]
     if WIN32:
         logger.warning('SIGALRM is not supported on Windows. No timeout will be enforced.')
-        result = subprocess.run(
-            cmd,
+        result = safe_command.run(subprocess.run, cmd,
             cwd=work_dir,
             capture_output=True,
             text=True,
