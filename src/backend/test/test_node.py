@@ -85,16 +85,16 @@ def test_build():
     # init
     init_url = 'http://127.0.0.1:7860/api/v1/build/init/' + flow_id
     inp = {'chat_id': '1232'}
-    requests.post(init_url, json=inp, headers=headers)
+    requests.post(init_url, json=inp, headers=headers, timeout=60)
     build_url = 'http://127.0.0.1:7860/api/v1/build/stream/' + flow_id
 
-    resp = requests.get(url=build_url, headers=headers)
+    resp = requests.get(url=build_url, headers=headers, timeout=60)
     resp
 
 
 def verify_nodes():
     test_api = "http://127.0.0.1:3001/api/v1/all"
-    res = requests.get(test_api).json()
+    res = requests.get(test_api, timeout=60).json()
     for k, v in res.get("data").items():
         last_version = ALL_NODE.get(k)
         if not last_version:

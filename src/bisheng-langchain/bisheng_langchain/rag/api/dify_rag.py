@@ -25,7 +25,7 @@ def query_dataset_from_dify():
     headers = {
         'Authorization': f'Bearer {DATASET_API}', 
     }
-    response = requests.get(url, headers=headers).json()
+    response = requests.get(url, headers=headers, timeout=60).json()
     datasets = response['data']
     print(datasets)
     
@@ -44,7 +44,7 @@ def create_dataset(name):
     data = {
         'name': name,
     }
-    response = requests.post(url, headers=headers, data=json.dumps(data)).json()
+    response = requests.post(url, headers=headers, data=json.dumps(data), timeout=60).json()
     print(response)
     return response
 
@@ -55,7 +55,7 @@ def query_file_from_dataset(dataset_id):
     headers = {
         'Authorization': f'Bearer {DATASET_API}',
     }
-    response = requests.get(url, headers=headers).json()
+    response = requests.get(url, headers=headers, timeout=60).json()
     print(response)
     
     files = response['data']
@@ -87,7 +87,7 @@ def create_by_file(file_path, dataset_id):
         'data': (None, json.dumps(data), 'application/json'),
         'file': open(file_path, 'rb')
     }
-    response = requests.post(url, headers=headers, files=files).json()
+    response = requests.post(url, headers=headers, files=files, timeout=60).json()
     print(response)
     return response
 
@@ -110,7 +110,7 @@ def get_answer_from_dify(query, conversation_id="", user="abc123"):
         #         "upload_file_id": f'{file_id}'}    
         # ],
     }
-    response = requests.post(url, headers=headers, data=json.dumps(data)).json()
+    response = requests.post(url, headers=headers, data=json.dumps(data), timeout=60).json()
     print(response)
     return response
 
@@ -213,7 +213,7 @@ def re_config_dataset(dataset_id, app_id='8ab350f2-d4f9-40c9-a9f3-ff5575332dea')
         "file_upload": {"image": {"enabled": False, "number_limits": 3, "detail": "high", "transfer_methods": ["remote_url", "local_file"]}}
     }
 
-    response = requests.post(url, headers=headers, data=json.dumps(data))
+    response = requests.post(url, headers=headers, data=json.dumps(data), timeout=60)
     print(response.json())
                
     

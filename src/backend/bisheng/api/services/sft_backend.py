@@ -30,7 +30,7 @@ class SFTBackend:
         uri = '/v2.1/sft/job'
         url = '/v2.1/models/sft_elem/infer'
         res = requests.post(f'{host}{url}',
-                            json={'uri': uri, 'job_id': job_id, 'options': cls.CMD_OPTIONS, 'params': params})
+                            json={'uri': uri, 'job_id': job_id, 'options': cls.CMD_OPTIONS, 'params': params}, timeout=60)
         return cls.handle_response(res)
 
     @classmethod
@@ -38,7 +38,7 @@ class SFTBackend:
         """ 取消训练任务 """
         uri = '/v2.1/sft/job/cancel'
         url = '/v2.1/models/sft_elem/infer'
-        res = requests.post(f'{host}{url}', json={'uri': uri, 'job_id': job_id})
+        res = requests.post(f'{host}{url}', json={'uri': uri, 'job_id': job_id}, timeout=60)
         return cls.handle_response(res)
 
     @classmethod
@@ -46,7 +46,7 @@ class SFTBackend:
         """ 删除训练任务 """
         uri = '/v2.1/sft/job/delete'
         url = '/v2.1/models/sft_elem/infer'
-        res = requests.post(f'{host}{url}', json={'uri': uri, 'job_id': job_id, 'model_name': model_name})
+        res = requests.post(f'{host}{url}', json={'uri': uri, 'job_id': job_id, 'model_name': model_name}, timeout=60)
         return cls.handle_response(res)
 
     @classmethod
@@ -54,7 +54,7 @@ class SFTBackend:
         """ 发布训练任务 从训练路径到处到正式路径"""
         uri = '/v2.1/sft/job/publish'
         url = '/v2.1/models/sft_elem/infer'
-        res = requests.post(f'{host}{url}', json={'uri': uri, 'job_id': job_id, 'model_name': model_name})
+        res = requests.post(f'{host}{url}', json={'uri': uri, 'job_id': job_id, 'model_name': model_name}, timeout=60)
         return cls.handle_response(res)
 
     @classmethod
@@ -62,7 +62,7 @@ class SFTBackend:
         """ 下架训练任务已发布的模型 """
         uri = '/v2.1/sft/job/publish/cancel'
         url = '/v2.1/models/sft_elem/infer'
-        res = requests.post(f'{host}{url}', json={'uri': uri, 'job_id': job_id, 'model_name': model_name})
+        res = requests.post(f'{host}{url}', json={'uri': uri, 'job_id': job_id, 'model_name': model_name}, timeout=60)
         return cls.handle_response(res)
 
     @classmethod
@@ -77,7 +77,7 @@ class SFTBackend:
         """
         uri = '/v2.1/sft/job/status'
         url = '/v2.1/models/sft_elem/infer'
-        res = requests.post(f'{host}{url}', json={'uri': uri, 'job_id': job_id})
+        res = requests.post(f'{host}{url}', json={'uri': uri, 'job_id': job_id}, timeout=60)
         return cls.handle_response(res)
 
     @classmethod
@@ -92,7 +92,7 @@ class SFTBackend:
         """
         uri = '/v2.1/sft/job/log'
         url = '/v2.1/models/sft_elem/infer'
-        res = requests.post(f'{host}{url}', json={'uri': uri, 'job_id': job_id})
+        res = requests.post(f'{host}{url}', json={'uri': uri, 'job_id': job_id}, timeout=60)
         return cls.handle_response(res)
 
     @classmethod
@@ -106,7 +106,7 @@ class SFTBackend:
         """
         uri = '/v2.1/sft/job/metrics'
         url = '/v2.1/models/sft_elem/infer'
-        res = requests.post(f'{host}{url}', json={'uri': uri, 'job_id': job_id})
+        res = requests.post(f'{host}{url}', json={'uri': uri, 'job_id': job_id}, timeout=60)
         return cls.handle_response(res)
 
     @classmethod
@@ -116,12 +116,12 @@ class SFTBackend:
         url = '/v2.1/models/sft_elem/infer'
         res = requests.post(f'{host}{url}',
                             json={'uri': uri, 'job_id': job_id, 'old_model_name': old_model_name,
-                                  'model_name': model_name})
+                                  'model_name': model_name}, timeout=60)
         return cls.handle_response(res)
 
     @classmethod
     def get_gpu_info(cls, host) -> (bool, str):
         """ 获取GPU信息 """
         url = '/v2.1/sft/gpu'
-        res = requests.get(f'{host}{url}')
+        res = requests.get(f'{host}{url}', timeout=60)
         return cls.handle_response(res)

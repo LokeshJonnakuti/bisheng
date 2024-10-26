@@ -16,7 +16,7 @@ def get_access_token(api_key, sec_key):
         'Accept': 'application/json'
     }
 
-    response = requests.request('POST', url, headers=headers, data=payload)
+    response = requests.request('POST', url, headers=headers, data=payload, timeout=60)
     return response.json().get('access_token')
 
 
@@ -51,7 +51,7 @@ class EmbeddingClient(object):
             payload = json.dumps({'input': sub_texts})
             response = requests.post(endpoint,
                                      headers=self.headers,
-                                     data=payload)
+                                     data=payload, timeout=60)
             status_message = 'success'
             status_code = response.status_code
             usage = {'prompt_tokens': 0, 'total_tokens': 0}

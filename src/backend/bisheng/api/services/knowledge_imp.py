@@ -383,7 +383,7 @@ def read_chunk_text(input_file, file_name, size, chunk_overlap, separator):
         if file_name.rsplit('.', 1)[-1].lower() != 'pdf':
             b64_data = base64.b64encode(open(input_file, 'rb').read()).decode()
             inp = dict(filename=file_name, b64_data=[b64_data], mode='topdf')
-            resp = requests.post(settings.get_knowledge().get('unstructured_api_url'), json=inp)
+            resp = requests.post(settings.get_knowledge().get('unstructured_api_url'), json=inp, timeout=60)
             if not resp or resp.status_code != 200:
                 logger.error(f'file_pdf=not_success resp={resp.text}')
                 raise Exception(f'当前文件无法解析， {resp.text}')

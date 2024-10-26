@@ -111,7 +111,7 @@ class LlmExtract(object):
             payload = copy.copy(input_template)
             payload['model'] = self.model_name
             try:
-                raw_response = requests.post(url=self.model_api_url, json=payload)
+                raw_response = requests.post(url=self.model_api_url, json=payload, timeout=60)
                 response = raw_response.json()
                 assert response['status_code'] == 200, response
                 choices = response.get('choices', [])
@@ -144,7 +144,7 @@ class LlmExtract(object):
             }
             inp = {'input': input, 'parameters': params, 'model': self.model_name}
             try:
-                raw_response = requests.post(url=self.model_api_url, json=inp, headers=header)
+                raw_response = requests.post(url=self.model_api_url, json=inp, headers=header, timeout=60)
                 response = raw_response.json()
                 response = response['output']
                 choices = response.get('choices', [])

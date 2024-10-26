@@ -15,5 +15,5 @@ class RTBackend(BaseModel):
     def unload_model(cls, host: str, model_name: str) -> (bool, str):
         """ 下线模型 """
         url = f'{host}/v2/repository/models/{model_name}/unload'
-        res = requests.post(url)
+        res = requests.post(url, timeout=60)
         return cls.handle_response(res)

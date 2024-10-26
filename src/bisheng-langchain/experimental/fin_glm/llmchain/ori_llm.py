@@ -25,7 +25,7 @@ def klg_llm_chain_func(inputs: dict) -> dict:
     }
     data = json.dumps(content, ensure_ascii=False).encode('utf-8')
     start = time.time()
-    response = requests.post(f"http://{URL}/v2.1/models/{model}/infer", headers=headers, data=data)
+    response = requests.post(f"http://{URL}/v2.1/models/{model}/infer", headers=headers, data=data, timeout=60)
     end = time.time()
     logger.info(f'klg_llm time cost: {end - start}')
     return {'answer': response.json()['choices'][0]['message']['content']}
@@ -53,7 +53,7 @@ def llm_chain_func(inputs: dict) -> dict:
     }
     data = json.dumps(content, ensure_ascii=False).encode('utf-8')
     start = time.time()
-    response = requests.post(f"http://{URL}/v2.1/models/{model}/infer", headers=headers, data=data)
+    response = requests.post(f"http://{URL}/v2.1/models/{model}/infer", headers=headers, data=data, timeout=60)
     end = time.time()
     logger.info(f'llm time cost: {end - start}')
     return {'answer': response.json()['choices'][0]['message']['content']}

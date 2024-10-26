@@ -51,7 +51,7 @@ def _test_uns():
                    'n': None
                })
 
-    resp = requests.post(url, json=inp).json()
+    resp = requests.post(url, json=inp, timeout=60).json()
     print(resp)
 
 

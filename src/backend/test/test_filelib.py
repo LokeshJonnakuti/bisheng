@@ -12,14 +12,14 @@ url_host = 'http://{ip}:{port}/api'.format(ip='127.0.0.1', port=7860)
 
 
 def test_env():
-    requests.get(url_host / 'v1/env')
+    requests.get(url_host / 'v1/env', timeout=60)
 
 
 def test_upload():
     file = {'file': open('../../Downloads/合同.pdf', 'rb')}
     resp = requests.post('http://127.0.0.1:7860/api/v2/filelib/file/1',
                          json={'callback_url': '123'},
-                         files=file)
+                         files=file, timeout=60)
     resp
 
 
@@ -28,7 +28,7 @@ def test_file(knowledge_id: int):
     data = {'knowledge_id': knowledge_id, 'metadata': "{\"url\":\"https://baidu.com\"}"}
     file = {'file': open('/Users/huangly/Downloads/co2.pdf', 'rb')}
 
-    resp = requests.post(url=url, data=data, files=file)
+    resp = requests.post(url=url, data=data, files=file, timeout=60)
     print(resp.text)
     resp
 
@@ -48,7 +48,7 @@ def string_knowledge(knowledge_id: int):
             }
         }]
     }
-    resp = requests.post(url=url, json=json_data)
+    resp = requests.post(url=url, json=json_data, timeout=60)
     print(resp.text)
     resp
 
@@ -58,7 +58,7 @@ def test_upload2():
     data = {'callback_url': 'https://baidu.com'}
     file = {'file': open('/Users/huangly/Downloads/co2.pdf', 'rb')}
 
-    resp = requests.post(url=url, data=data, files=file)
+    resp = requests.post(url=url, data=data, files=file, timeout=60)
     resp
 
 
@@ -69,7 +69,7 @@ def test_create():
                           model='multilingual-e5-large',
                           user_id=1,
                           is_partition=False)
-    resp = requests.post(url=url, json=inp.model_dump())
+    resp = requests.post(url=url, json=inp.model_dump(), timeout=60)
     print(resp.text)
     return resp
 

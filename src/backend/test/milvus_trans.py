@@ -173,14 +173,14 @@ def elastic_clean():
     user_name = 'elastic'
     auth = 'MBDsrs5O_zHCE+12na3f'
     del_url = 'http://192.168.106.109:9200/%s'
-    col = requests.get(url, auth=(user_name, auth)).json()
+    col = requests.get(url, auth=(user_name, auth), timeout=60).json()
     for c in col.get('indices').keys():
         if c.startswith('tmp'):
             print(c)
-            x = requests.delete(del_url % c, auth=(user_name, auth))
+            x = requests.delete(del_url % c, auth=(user_name, auth), timeout=60)
         elif col.get('indices').get(c).get('primaries').get('docs').get('count') == 0:
             print(c)
-            x = requests.delete(del_url % c, auth=(user_name, auth))
+            x = requests.delete(del_url % c, auth=(user_name, auth), timeout=60)
             print(x)
 
 

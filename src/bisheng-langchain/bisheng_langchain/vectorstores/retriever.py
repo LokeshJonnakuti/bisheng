@@ -80,7 +80,7 @@ class VectorStoreFilterRetriever(VectorStoreRetriever):
     def get_file_access(self, docs: List[Document]):
         file_ids = [doc.metadata.get('file_id') for doc in docs if 'file_id' in doc.metadata]
         if file_ids:
-            res = requests.get(self.access_url, json=file_ids)
+            res = requests.get(self.access_url, json=file_ids, timeout=60)
             if res.status_code == 200:
                 doc_res = res.json().get('data') or []
                 doc_right = {doc.get('docid') for doc in doc_res if doc.get('result') == 1}

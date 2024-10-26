@@ -75,7 +75,7 @@ class ChatCompletion(object):
 
         response = requests.post(self.endpoint,
                                  headers=self.headers,
-                                 json=payload)
+                                 json=payload, timeout=60)
 
         req_type = 'chat.completion'
         status_message = 'success'

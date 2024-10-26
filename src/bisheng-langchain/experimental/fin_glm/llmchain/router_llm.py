@@ -22,7 +22,7 @@ def router_llm(inputs: dict) -> dict:
 
     data = json.dumps(content, ensure_ascii=False).encode('utf-8')
     start = time.time()
-    response = requests.post(f"{URL}/v2.1/models/{model}/infer", headers=headers, data=data)
+    response = requests.post(f"{URL}/v2.1/models/{model}/infer", headers=headers, data=data, timeout=60)
     end = time.time()
     logger.info(f'router_llm time cost: {end - start}')
 

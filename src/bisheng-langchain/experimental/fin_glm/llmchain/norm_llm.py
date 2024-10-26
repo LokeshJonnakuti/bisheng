@@ -20,7 +20,7 @@ def normlize_llm(inputs: dict) -> dict:
     }
 
     data = json.dumps(content, ensure_ascii=False).encode('utf-8')
-    response = requests.post(f"{URL}/v2.1/models/{model}/infer", headers=headers, data=data)
+    response = requests.post(f"{URL}/v2.1/models/{model}/infer", headers=headers, data=data, timeout=60)
 
     # get response content
     response_content = response.json()['choices'][0]['message']['content']
