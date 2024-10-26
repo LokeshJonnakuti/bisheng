@@ -3,8 +3,7 @@ from typing import Dict, List, Optional, Type
 from bisheng.interface.base import LangChainTypeCreator
 from bisheng.interface.custom_lists import textsplitter_type_to_cls_dict
 from bisheng.settings import settings
-from bisheng.template.frontend_node.textsplitters import \
-    TextSplittersFrontendNode
+from bisheng.template.frontend_node.textsplitters import TextSplittersFrontendNode
 from bisheng.utils.logger import logger
 from bisheng.utils.util import build_template_from_class
 

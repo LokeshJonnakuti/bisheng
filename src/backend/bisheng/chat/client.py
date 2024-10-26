@@ -1,15 +1,12 @@
 import json
-from typing import Dict, Callable
-from uuid import UUID, uuid4
 from queue import Queue
-
-from loguru import logger
-from langchain_core.messages import AIMessage, HumanMessage
-from fastapi import WebSocket, status, Request
+from typing import Callable, Dict
+from uuid import UUID, uuid4
 
 from bisheng.api.services.assistant_agent import AssistantAgent
 from bisheng.api.services.audit_log import AuditLogService
 from bisheng.api.services.user_service import UserPayload
+from bisheng.api.utils import get_request_ip
 from bisheng.api.v1.callback import AsyncGptsDebugCallbackHandler
 from bisheng.api.v1.schemas import ChatMessage, ChatResponse
 from bisheng.chat.types import IgnoreException, WorkType
@@ -17,8 +14,10 @@ from bisheng.database.models.assistant import AssistantDao, AssistantStatus
 from bisheng.database.models.message import ChatMessage as ChatMessageModel
 from bisheng.database.models.message import ChatMessageDao
 from bisheng.settings import settings
-from bisheng.api.utils import get_request_ip
 from bisheng.utils.threadpool import ThreadPoolManager, thread_pool
+from fastapi import Request, WebSocket, status
+from langchain_core.messages import AIMessage, HumanMessage
+from loguru import logger
 
 
 class ChatClient:
@@ -138,7 +137,7 @@ class ChatClient:
                 if not assistant:
                     raise IgnoreException('该助手已被删除')
         except IgnoreException as e:
-            logger.exception("get assistant info error")
+            logger.exception('get assistant info error')
             raise IgnoreException(f'get assistant info error: {str(e)}')
         try:
             if self.chat_id and self.gpts_agent is None:
@@ -150,7 +149,7 @@ class ChatClient:
                 self.gpts_agent = AssistantAgent(assistant, self.chat_id)
                 await self.gpts_agent.init_assistant(self.gpts_async_callback)
         except Exception as e:
-            logger.exception("agent init error")
+            logger.exception('agent init error')
             raise Exception(f'agent init error: {str(e)}')
 
     async def init_chat_history(self):
@@ -268,8 +267,8 @@ class ChatClient:
             # todo: 后续优化代码解释器的实现方案，保证输出的文件可以公开访问 ugly solve
             # 获取minio的share地址，把share域名去掉, 为毕昇的部署方案特殊处理下
             if gpts_tool_conf := self.gpts_conf.get('tools'):
-                if bisheng_code_conf := gpts_tool_conf.get("bisheng_code_interpreter"):
-                    answer = answer.replace(f"http://{bisheng_code_conf['minio']['MINIO_SHAREPOIN']}", "")
+                if bisheng_code_conf := gpts_tool_conf.get('bisheng_code_interpreter'):
+                    answer = answer.replace(f"http://{bisheng_code_conf['minio']['MINIO_SHAREPOIN']}", '')
             answer_end_type = 'end'
             # 如果是流式的llm则用end_cover结束, 覆盖之前流式的输出
             if getattr(self.gpts_agent.llm, 'streaming', False):

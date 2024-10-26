@@ -4,8 +4,8 @@ from typing import Dict, List, Optional
 
 from bisheng.database.base import session_getter
 from bisheng.database.models.base import SQLModelSerializable
-from sqlalchemy import JSON, Column, DateTime, String, text, func
-from sqlmodel import Field, or_, select, Text, update
+from sqlalchemy import JSON, Column, DateTime, String, func, text
+from sqlmodel import Field, Text, or_, select, update
 
 
 class AuthMethod(Enum):
@@ -14,8 +14,8 @@ class AuthMethod(Enum):
 
 
 class AuthType(Enum):
-    BASIC = "basic"
-    BEARER = "bearer"
+    BASIC = 'basic'
+    BEARER = 'bearer'
 
 
 class GptsToolsBase(SQLModelSerializable):
@@ -39,14 +39,14 @@ class GptsToolsBase(SQLModelSerializable):
 
 class GptsToolsTypeBase(SQLModelSerializable):
     id: Optional[int] = Field(index=True, primary_key=True)
-    name: str = Field(default='', index=True, description="工具类别名字")
-    logo: Optional[str] = Field(default='', description="工具类别的logo文件地址")
-    description: str = Field(default='', description="工具类别的描述")
-    server_host: Optional[str] = Field(default='', description="自定义工具的访问根地址，必须以http或者https开头")
-    auth_method: Optional[int] = Field(default=0, description="工具类别的鉴权方式")
-    api_key: Optional[str] = Field(default='', description="工具鉴权的api_key")
-    auth_type: Optional[str] = Field(default=AuthType.BASIC.value, description="工具鉴权的鉴权方式")
-    is_preset: Optional[int] = Field(default=0, description="是否是预置工具类别")
+    name: str = Field(default='', index=True, description='工具类别名字')
+    logo: Optional[str] = Field(default='', description='工具类别的logo文件地址')
+    description: str = Field(default='', description='工具类别的描述')
+    server_host: Optional[str] = Field(default='', description='自定义工具的访问根地址，必须以http或者https开头')
+    auth_method: Optional[int] = Field(default=0, description='工具类别的鉴权方式')
+    api_key: Optional[str] = Field(default='', description='工具鉴权的api_key')
+    auth_type: Optional[str] = Field(default=AuthType.BASIC.value, description='工具鉴权的鉴权方式')
+    is_preset: Optional[int] = Field(default=0, description='是否是预置工具类别')
     user_id: Optional[int] = Field(index=True, description='创建用户ID， null表示系统创建')
     is_delete: int = Field(default=0, description='1 表示逻辑删除')
     create_time: Optional[datetime] = Field(
@@ -68,13 +68,13 @@ class GptsTools(GptsToolsBase, table=True):
 
 class GptsToolsType(GptsToolsTypeBase, table=True):
     __tablename__ = 't_gpts_tools_type'
-    openapi_schema: str = Field(default="", sa_column=Column(Text),
-                                description="工具类别的schema内容，符合openapi规范的数据")
+    openapi_schema: str = Field(default='', sa_column=Column(Text),
+                                description='工具类别的schema内容，符合openapi规范的数据')
 
 
 class GptsToolsTypeRead(GptsToolsTypeBase):
-    openapi_schema: Optional[str] = Field(default="", description="工具类别的schema内容，符合openapi规范的数据")
-    children: Optional[List[GptsTools]] = Field(default=[], description="工具类别下的工具列表")
+    openapi_schema: Optional[str] = Field(default='', description='工具类别的schema内容，符合openapi规范的数据')
+    children: Optional[List[GptsTools]] = Field(default=[], description='工具类别下的工具列表')
 
 
 class GptsToolsRead(GptsToolsBase):

@@ -4,16 +4,16 @@ import time
 from typing import List, Optional
 from uuid import uuid4
 
-from bisheng.api.utils import get_request_ip
 from bisheng.api.errcode.base import UnAuthorizedError
 from bisheng.api.services.audit_log import AuditLogService
 from bisheng.api.services.knowledge_imp import (addEmbedding, decide_vectorstores,
                                                 delete_knowledge_file_vectors, retry_files)
 from bisheng.api.services.user_service import UserPayload, get_login_user
+from bisheng.api.utils import get_request_ip
 from bisheng.api.v1.schemas import UnifiedResponseModel, UploadFileResponse, resp_200, resp_500
 from bisheng.cache.utils import file_download, save_uploaded_file
 from bisheng.database.base import session_getter
-from bisheng.database.models.group_resource import GroupResource, ResourceTypeEnum, GroupResourceDao
+from bisheng.database.models.group_resource import GroupResource, GroupResourceDao, ResourceTypeEnum
 from bisheng.database.models.knowledge import (Knowledge, KnowledgeCreate, KnowledgeDao,
                                                KnowledgeRead)
 from bisheng.database.models.knowledge_file import (KnowledgeFile, KnowledgeFileDao,
@@ -26,7 +26,7 @@ from bisheng.settings import settings
 from bisheng.utils.logger import logger
 from bisheng.utils.minio_client import MinioClient
 from bisheng_langchain.vectorstores import ElasticKeywordsSearch
-from fastapi import APIRouter, BackgroundTasks, Depends, File, HTTPException, UploadFile, Request
+from fastapi import APIRouter, BackgroundTasks, Depends, File, HTTPException, Request, UploadFile
 from fastapi.encoders import jsonable_encoder
 from fastapi_jwt_auth import AuthJWT
 from langchain_community.document_loaders import (BSHTMLLoader, PyPDFLoader, TextLoader,
@@ -179,9 +179,9 @@ def upload_knowledge_file_hook(request: Request, login_user: UserPayload, knowle
                                file_list: List[KnowledgeFile]):
     logger.info(f'act=upload_knowledge_file_hook user={login_user.user_name} knowledge_id={knowledge_id}')
     # 记录审计日志
-    file_name = ""
+    file_name = ''
     for one in file_list:
-        file_name += "\n\n" + one.file_name
+        file_name += '\n\n' + one.file_name
     AuditLogService.upload_knowledge_file(login_user, get_request_ip(request), knowledge_id, file_name)
 
 
@@ -293,7 +293,7 @@ def get_knowledge(*,
         return resp_200({'data': res, 'total': total_count})
 
     except Exception as e:
-        logger.exception("get_knowledge error")
+        logger.exception('get_knowledge error')
         raise HTTPException(status_code=500, detail=str(e)) from e
 
 
@@ -451,7 +451,7 @@ def delete_knowledge_file_hook(request: Request, login_user: UserPayload, knowle
     logger.info(f'act=delete_knowledge_file_hook user={login_user.user_name} knowledge_id={knowledge_id}')
     # 记录审计日志
     # 记录审计日志
-    file_name = ""
+    file_name = ''
     for one in file_list:
-        file_name += "\n\n" + one.file_name
+        file_name += '\n\n' + one.file_name
     AuditLogService.delete_knowledge_file(login_user, get_request_ip(request), knowledge_id, file_name)

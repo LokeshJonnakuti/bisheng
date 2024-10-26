@@ -1,9 +1,6 @@
 from langchain_core.prompts import PromptTemplate
-from langchain_core.prompts.chat import (
-    ChatPromptTemplate,
-    HumanMessagePromptTemplate,
-    SystemMessagePromptTemplate,
-)
+from langchain_core.prompts.chat import (ChatPromptTemplate, HumanMessagePromptTemplate,
+                                         SystemMessagePromptTemplate)
 
 # 例如助手的身份、相关完成任务的具体方法和步骤、回答问题时的语气以及应该注意什么问题等
 system_template = """你是一个prompt优化大师，你会得到一个助手的名字和简单描述，你需要根据这些信息，为助手生成一个合适的角色描述、详细的技能说明、相关约束信息，输出为markdown格式。你需要按照以下格式进行组织输出内容：

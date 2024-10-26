@@ -10,13 +10,11 @@ from bisheng_langchain.gpts.tools.api_tools import ALL_API_TOOLS
 from bisheng_langchain.gpts.tools.bing_search.tool import BingSearchRun
 from bisheng_langchain.gpts.tools.calculator.tool import calculator
 from bisheng_langchain.gpts.tools.code_interpreter.tool import CodeInterpreterTool
-
 # from langchain_community.utilities.dalle_image_generator import DallEAPIWrapper
-from bisheng_langchain.gpts.tools.dalle_image_generator.tool import (
-    DallEAPIWrapper,
-    DallEImageGenerator,
-)
+from bisheng_langchain.gpts.tools.dalle_image_generator.tool import (DallEAPIWrapper,
+                                                                     DallEImageGenerator)
 from bisheng_langchain.gpts.tools.get_current_time.tool import get_current_time
+from bisheng_langchain.rag import BishengRAGTool
 from dotenv import load_dotenv
 from langchain_community.tools.arxiv.tool import ArxivQueryRun
 from langchain_community.tools.bearly.tool import BearlyInterpreterTool
@@ -26,7 +24,6 @@ from langchain_core.callbacks import BaseCallbackManager, Callbacks
 from langchain_core.language_models import BaseLanguageModel
 from langchain_core.tools import BaseTool, Tool
 from mypy_extensions import Arg, KwArg
-from bisheng_langchain.rag import BishengRAGTool
 
 
 def _get_current_time() -> BaseTool:
@@ -86,7 +83,7 @@ def _get_native_code_interpreter(**kwargs: Any) -> Tool:
 _EXTRA_PARAM_TOOLS: Dict[str, Tuple[Callable[[KwArg(Any)], BaseTool], List[Optional[str]], List[Optional[str]]]] = {  # type: ignore
     'dalle_image_generator': (_get_dalle_image_generator, ['openai_api_key', 'openai_proxy'], []),
     'bing_search': (_get_bing_search, ['bing_subscription_key', 'bing_search_url'], []),
-    'bisheng_code_interpreter': (_get_native_code_interpreter, ["minio"], ['files']),
+    'bisheng_code_interpreter': (_get_native_code_interpreter, ['minio'], ['files']),
     'bisheng_rag': (BishengRAGTool.get_rag_tool, ['name', 'description'], ['vector_store', 'keyword_store', 'llm', 'collection_name', 'max_content', 'sort_by_source_and_index']),
 }
 
@@ -181,10 +178,10 @@ def get_tool_table():
         port=int(os.getenv('MYSQL_PORT')),
     )
     cursor = db.cursor()
-    cursor.execute("SELECT name, t.desc, tool_key, extra FROM t_gpts_tools as t;")
+    cursor.execute('SELECT name, t.desc, tool_key, extra FROM t_gpts_tools as t;')
     results = cursor.fetchall()
     db.close()
-    
+
     df = pd.DataFrame(
         columns=[
             '前端工具名',

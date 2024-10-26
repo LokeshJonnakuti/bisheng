@@ -3,7 +3,7 @@ from typing import Dict, Optional
 from uuid import UUID
 
 from bisheng.database.models.base import SQLModelSerializable
-from sqlalchemy import JSON, Column, DateTime, text, String
+from sqlalchemy import JSON, Column, DateTime, String, text
 from sqlmodel import Field
 
 

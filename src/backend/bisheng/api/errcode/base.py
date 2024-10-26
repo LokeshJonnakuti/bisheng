@@ -1,6 +1,5 @@
-from fastapi.exceptions import HTTPException
-
 from bisheng.api.v1.schemas import UnifiedResponseModel
+from fastapi.exceptions import HTTPException
 
 
 class BaseErrorCode:

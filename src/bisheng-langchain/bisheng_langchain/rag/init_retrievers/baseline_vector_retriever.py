@@ -1,16 +1,15 @@
 import os
 import uuid
-from loguru import logger
 from typing import Any, Dict, Iterable, List, Optional
 
 from bisheng_langchain.vectorstores.milvus import Milvus
+from langchain.callbacks.manager import CallbackManagerForRetrieverRun
+from langchain.text_splitter import TextSplitter
 from langchain_core.documents import Document
 from langchain_core.pydantic_v1 import Field
 from langchain_core.retrievers import BaseRetriever
 from langchain_core.vectorstores import VectorStore
-
-from langchain.callbacks.manager import CallbackManagerForRetrieverRun
-from langchain.text_splitter import TextSplitter
+from loguru import logger
 
 
 class BaselineVectorRetriever(BaseRetriever):
@@ -33,7 +32,7 @@ class BaselineVectorRetriever(BaseRetriever):
                 split_doc.metadata.pop('chunk_bboxes')
             split_doc.metadata['chunk_index'] = chunk_index
             if kwargs.get('add_aux_info', False):
-                split_doc.page_content = split_doc.metadata["source"] + '\n' + split_doc.metadata["title"] + '\n' + split_doc.page_content
+                split_doc.page_content = split_doc.metadata['source'] + '\n' + split_doc.metadata['title'] + '\n' + split_doc.page_content
 
         connection_args = self.vector_store.connection_args
         embedding_function = self.vector_store.embedding_func

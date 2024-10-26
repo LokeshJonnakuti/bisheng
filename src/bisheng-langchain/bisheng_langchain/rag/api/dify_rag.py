@@ -1,11 +1,12 @@
+import json
 import os
 import pdb
+
 import pandas as pd
 import requests
-import json
+import tqdm
 from config import API_KEY, DATASET_API, DIFY_TOKEN
 from loguru import logger
-import tqdm
 
 datasets = set()
 dataset = {}
@@ -23,12 +24,12 @@ def query_dataset_from_dify():
     --header 'Authorization: Bearer {api_key}'"""
     url = 'https://api.dify.ai/v1/datasets?page=1&limit=100'
     headers = {
-        'Authorization': f'Bearer {DATASET_API}', 
+        'Authorization': f'Bearer {DATASET_API}',
     }
     response = requests.get(url, headers=headers, timeout=60).json()
     datasets = response['data']
     print(datasets)
-    
+
     for dataset in datasets:
         name = dataset['name']
         id = dataset['id']
@@ -57,30 +58,30 @@ def query_file_from_dataset(dataset_id):
     }
     response = requests.get(url, headers=headers, timeout=60).json()
     print(response)
-    
+
     files = response['data']
     return files
-    
+
 def create_by_file(file_path, dataset_id):
     url = f'https://api.dify.ai/v1/datasets/{dataset_id}/document/create_by_file'
     headers = {
         'Authorization': f'Bearer {DATASET_API}',
     }
     data = {
-        "name": "Dify",
-        "indexing_technique": "high_quality",
-        "process_rule": {
-            "rules": {
-                "pre_processing_rules": [
-                    {"id": "remove_extra_spaces", "enabled": True},
-                    {"id": "remove_urls_emails", "enabled": True}
+        'name': 'Dify',
+        'indexing_technique': 'high_quality',
+        'process_rule': {
+            'rules': {
+                'pre_processing_rules': [
+                    {'id': 'remove_extra_spaces', 'enabled': True},
+                    {'id': 'remove_urls_emails', 'enabled': True}
                 ],
-                "segmentation": {
-                    "separator": "###",
-                    "max_tokens": 500
+                'segmentation': {
+                    'separator': '###',
+                    'max_tokens': 500
                 }
             },
-            "mode": "automatic"
+            'mode': 'automatic'
         }
     }
     files = {
@@ -91,7 +92,7 @@ def create_by_file(file_path, dataset_id):
     print(response)
     return response
 
-def get_answer_from_dify(query, conversation_id="", user="abc123"):
+def get_answer_from_dify(query, conversation_id='', user='abc123'):
     url = 'https://api.dify.ai/v1/chat-messages'
     headers = {
         'Authorization': f'Bearer {API_KEY}',
@@ -107,7 +108,7 @@ def get_answer_from_dify(query, conversation_id="", user="abc123"):
         #     {
         #         "type": "image",
         #         "transfer_method": "local_file",
-        #         "upload_file_id": f'{file_id}'}    
+        #         "upload_file_id": f'{file_id}'}
         # ],
     }
     response = requests.post(url, headers=headers, data=json.dumps(data), timeout=60).json()
@@ -126,22 +127,22 @@ def upload_file_to_dify(data_dir, excel_file, save_excel_file):
             question_info[column] = value
             # print(f"Row {index}, Column {column} has value {value}")
         all_questions_info.append(question_info)
-    
+
     for questions_info in tqdm(all_questions_info):
         collection_name = questions_info['知识库名']
         file_name = questions_info['文件名']
         file_type = questions_info['文件类型']
-        
+
         # pdb.set_trace()
         if file_type == 'pdf':
             # 没有知识库先创建
             if collection_name not in datasets:
                 res = create_dataset(collection_name)
                 dataset_id = res['id']
-                add_dataset(collection_name, dataset_id) 
+                add_dataset(collection_name, dataset_id)
             else:
                 dataset_id = dataset[collection_name]
-           
+
             #  查询知识库中是否有该文件
             files = query_file_from_dataset(dataset_id)
             has_file = False
@@ -157,9 +158,9 @@ def upload_file_to_dify(data_dir, excel_file, save_excel_file):
                 except Exception as e:
                     file_id = ''
                     logger.warning(f'error in create file {file_name}: {e}')
-                    
-            questions_info['dataset_id'] = dataset_id           
-        
+
+            questions_info['dataset_id'] = dataset_id
+
     # save excel
     df = pd.DataFrame(all_questions_info)
     df.to_excel(save_excel_file, index=False)
@@ -184,39 +185,39 @@ def re_config_dataset(dataset_id, app_id='8ab350f2-d4f9-40c9-a9f3-ff5575332dea')
         'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
     }
     data = {
-        "pre_prompt": None,
-        "prompt_type": "simple",
-        "chat_prompt_config": {},
-        "completion_prompt_config": {},
-        "user_input_form": [],
-        "dataset_query_variable": "",
-        "opening_statement": "",
-        "more_like_this": {"enabled": False},
-        "suggested_questions_after_answer": {"enabled": False},
-        "speech_to_text": {"enabled": False},
-        "retriever_resource": {"enabled": False},
-        "sensitive_word_avoidance": {"enabled": False, "type": "", "configs": []},
-        "external_data_tools": [],
-        "agent_mode": {
-            "enabled": True,
-            "tools": [
-                {"dataset": {"enabled": True, "id": f'{dataset_id}'}},
+        'pre_prompt': None,
+        'prompt_type': 'simple',
+        'chat_prompt_config': {},
+        'completion_prompt_config': {},
+        'user_input_form': [],
+        'dataset_query_variable': '',
+        'opening_statement': '',
+        'more_like_this': {'enabled': False},
+        'suggested_questions_after_answer': {'enabled': False},
+        'speech_to_text': {'enabled': False},
+        'retriever_resource': {'enabled': False},
+        'sensitive_word_avoidance': {'enabled': False, 'type': '', 'configs': []},
+        'external_data_tools': [],
+        'agent_mode': {
+            'enabled': True,
+            'tools': [
+                {'dataset': {'enabled': True, 'id': f'{dataset_id}'}},
             ]
         },
-        "model": {
-            "provider": "openai",
-            "name": "gpt-4-1106-preview",
-            "mode": "chat",
-            "completion_params": {"max_tokens": 512, "temperature": 1, "top_p": 1, "presence_penalty": 0, "frequency_penalty": 0}
+        'model': {
+            'provider': 'openai',
+            'name': 'gpt-4-1106-preview',
+            'mode': 'chat',
+            'completion_params': {'max_tokens': 512, 'temperature': 1, 'top_p': 1, 'presence_penalty': 0, 'frequency_penalty': 0}
         },
-        "dataset_configs": {"retrieval_model": "single", "top_k": 20, "score_threshold": 0.5},
-        "file_upload": {"image": {"enabled": False, "number_limits": 3, "detail": "high", "transfer_methods": ["remote_url", "local_file"]}}
+        'dataset_configs': {'retrieval_model': 'single', 'top_k': 20, 'score_threshold': 0.5},
+        'file_upload': {'image': {'enabled': False, 'number_limits': 3, 'detail': 'high', 'transfer_methods': ['remote_url', 'local_file']}}
     }
 
     response = requests.post(url, headers=headers, data=json.dumps(data), timeout=60)
     print(response.json())
-               
-    
+
+
 def question_answer(excel_file):
     df = pd.read_excel(excel_file)
     all_questions_info = list()
@@ -228,7 +229,7 @@ def question_answer(excel_file):
             value = row[column]
             question_info[column] = value
             # print(f"Row {index}, Column {column} has value {value}")
-        all_questions_info.append(question_info)  
+        all_questions_info.append(question_info)
 
     for questions_info in all_questions_info:
         question = questions_info['问题']
@@ -237,18 +238,18 @@ def question_answer(excel_file):
         dataset_id = questions_info['dataset_id']
         if collection_name not in datasets or dataset_id == '':
             res = create_dataset(collection_name)
-            dataset_id = add_dataset(collection_name, res['id']) 
-        
+            dataset_id = add_dataset(collection_name, res['id'])
+
         try:
             re_config_dataset(dataset_id)
             response = get_answer_from_dify(question)
             ans = response['answer']
         except Exception as e:
             print(f'error in query {question}')
-            ans = ''    
+            ans = ''
         print('ans:', ans, 'question:', question)
         questions_info['dify_answer'] = ans
-    
+
     df = pd.DataFrame(all_questions_info)
     df.to_excel(os.path.join('questions_info_with_answer_dify.xlsx'), index=False)
 
@@ -257,8 +258,7 @@ if __name__ == '__main__':
     save_dir = './rag_benchmark_v1.0/rag_benchmark_processed'
     excel_file = './data/questions_info_with_answer_sample.xlsx'
     save_excel_file = './data/questions_info_with_dify_file_id.xlsx'
-    
+
     query_dataset_from_dify()
     # upload_file_to_dify(save_dir, excel_file, save_excel_file)
     question_answer(save_excel_file)
-    
