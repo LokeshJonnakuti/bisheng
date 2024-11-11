@@ -2,9 +2,6 @@ import json
 from typing import List, Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, File, Query, UploadFile
-from fastapi_jwt_auth import AuthJWT
-
 from bisheng.api.services.finetune import FinetuneService
 from bisheng.api.services.finetune_file import FinetuneFileService
 from bisheng.api.services.user_service import get_login_user
@@ -12,6 +9,8 @@ from bisheng.api.v1.schemas import FinetuneCreateReq, UnifiedResponseModel, resp
 from bisheng.database.models.finetune import Finetune, FinetuneChangeModelName, FinetuneList
 from bisheng.database.models.preset_train import PresetTrain
 from bisheng.utils.minio_client import MinioClient
+from fastapi import APIRouter, Depends, File, Query, UploadFile
+from fastapi_jwt_auth import AuthJWT
 
 router = APIRouter(prefix='/finetune', tags=['Finetune'], dependencies=[Depends(get_login_user)])
 

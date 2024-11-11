@@ -1,15 +1,14 @@
 from datetime import datetime
 from typing import List, Optional
 
-from pydantic import validator
-from sqlalchemy import Column, DateTime, text, func
-from sqlmodel import Field, select
-
 from bisheng.database.base import session_getter
 from bisheng.database.models.base import SQLModelSerializable
-from bisheng.database.models.role import DefaultRole, AdminRole
+from bisheng.database.models.role import AdminRole, DefaultRole
 from bisheng.database.models.user_group import UserGroup
 from bisheng.database.models.user_role import UserRole
+from pydantic import validator
+from sqlalchemy import Column, DateTime, func, text
+from sqlmodel import Field, select
 
 
 class UserBase(SQLModelSerializable):
@@ -41,7 +40,7 @@ class User(UserBase, table=True):
     password_update_time: Optional[datetime] = Field(sa_column=Column(DateTime,
                                                                       nullable=False,
                                                                       server_default=text('CURRENT_TIMESTAMP')),
-                                                     description="密码最近的修改时间")
+                                                     description='密码最近的修改时间')
 
 
 class UserRead(UserBase):
@@ -64,7 +63,7 @@ class UserLogin(UserBase):
 
 
 class UserCreate(UserBase):
-    password: Optional[str] = Field(default="")
+    password: Optional[str] = Field(default='')
     captcha_key: Optional[str]
     captcha: Optional[str]
 

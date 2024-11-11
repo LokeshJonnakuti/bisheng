@@ -1,5 +1,6 @@
 import hashlib
 import json
+import secrets
 import string
 import uuid
 from base64 import b64encode
@@ -9,38 +10,39 @@ from typing import Annotated, Dict, List, Optional
 from uuid import UUID
 
 import rsa
-from fastapi import APIRouter, Depends, HTTPException, Query, Body, Request
-from fastapi.encoders import jsonable_encoder
-from fastapi.security import OAuth2PasswordBearer
-from fastapi_jwt_auth import AuthJWT
-from sqlalchemy import and_, func
-from sqlmodel import delete, select
-
 from bisheng.api.errcode.base import UnAuthorizedError
-from bisheng.api.errcode.user import (UserNotPasswordError, UserPasswordExpireError,
-                                      UserValidateError, UserPasswordError)
+from bisheng.api.errcode.user import (UserNotPasswordError, UserPasswordError,
+                                      UserPasswordExpireError, UserValidateError)
 from bisheng.api.JWT import ACCESS_TOKEN_EXPIRE_TIME
-from bisheng.api.utils import get_request_ip
 from bisheng.api.services.audit_log import AuditLogService
 from bisheng.api.services.captcha import verify_captcha
-from bisheng.api.services.user_service import (UserPayload, gen_user_jwt, gen_user_role, get_login_user,
-                                               get_assistant_list_by_access, get_admin_user, UserService)
-from bisheng.api.v1.schemas import UnifiedResponseModel, resp_200, CreateUserReq
+from bisheng.api.services.user_service import (UserPayload, UserService, gen_user_jwt,
+                                               gen_user_role, get_admin_user,
+                                               get_assistant_list_by_access, get_login_user)
+from bisheng.api.utils import get_request_ip
+from bisheng.api.v1.schemas import CreateUserReq, UnifiedResponseModel, resp_200
 from bisheng.cache.redis import redis_client
 from bisheng.database.base import session_getter
 from bisheng.database.models.flow import Flow
 from bisheng.database.models.group import GroupDao
 from bisheng.database.models.knowledge import Knowledge
-from bisheng.database.models.role import Role, RoleCreate, RoleDao, RoleUpdate, AdminRole, DefaultRole
+from bisheng.database.models.role import (AdminRole, DefaultRole, Role, RoleCreate, RoleDao,
+                                          RoleUpdate)
 from bisheng.database.models.role_access import AccessType, RoleAccess, RoleRefresh
 from bisheng.database.models.user import User, UserCreate, UserDao, UserLogin, UserRead, UserUpdate
 from bisheng.database.models.user_group import UserGroupDao
 from bisheng.database.models.user_role import UserRole, UserRoleCreate, UserRoleDao
 from bisheng.settings import settings
-from bisheng.utils.constants import CAPTCHA_PREFIX, RSA_KEY, USER_PASSWORD_ERROR, USER_CURRENT_SESSION
+from bisheng.utils.constants import (CAPTCHA_PREFIX, RSA_KEY, USER_CURRENT_SESSION,
+                                     USER_PASSWORD_ERROR)
 from bisheng.utils.logger import logger
 from captcha.image import ImageCaptcha
-import secrets
+from fastapi import APIRouter, Body, Depends, HTTPException, Query, Request
+from fastapi.encoders import jsonable_encoder
+from fastapi.security import OAuth2PasswordBearer
+from fastapi_jwt_auth import AuthJWT
+from sqlalchemy import and_, func
+from sqlmodel import delete, select
 
 # build router
 router = APIRouter(prefix='', tags=['User'])
@@ -273,13 +275,13 @@ async def list_user(*,
         # 如果不是超级管理，则需要将数据过滤, 不能看到非他管理的用户组内的角色和用户组列表
         if user_admin_groups:
             for i in range(len(user_roles) - 1, -1, -1):
-                if user_roles[i]["group_id"] not in user_admin_groups:
+                if user_roles[i]['group_id'] not in user_admin_groups:
                     del user_roles[i]
             for i in range(len(user_groups) - 1, -1, -1):
-                if user_groups[i]["id"] not in user_admin_groups:
+                if user_groups[i]['id'] not in user_admin_groups:
                     del user_groups[i]
-        one_data["roles"] = user_roles
-        one_data["groups"] = user_groups
+        one_data['roles'] = user_roles
+        one_data['groups'] = user_groups
         res.append(one_data)
 
     return resp_200({'data': res, 'total': total_count})
@@ -299,9 +301,9 @@ def get_user_roles(user: User, role_cache: Dict) -> List[Dict]:
         role_list = RoleDao.get_role_by_ids(user_role_ids)
         for role_info in role_list:
             role_cache[role_info.id] = {
-                "id": role_info.id,
-                "group_id": role_info.group_id,
-                "name": role_info.role_name
+                'id': role_info.id,
+                'group_id': role_info.group_id,
+                'name': role_info.role_name
             }
             res.append(role_cache.get(role_info.id))
     return res
@@ -465,7 +467,7 @@ async def get_role(*,
     # 查询所有的角色列表
     res = RoleDao.get_role_by_groups(group_ids, role_name, page, limit)
     total = RoleDao.count_role_by_groups(group_ids, role_name)
-    return resp_200(data={"data": res, "total": total})
+    return resp_200(data={'data': res, 'total': total})
 
 
 @router.delete('/role/{role_id}', status_code=200)
@@ -557,14 +559,14 @@ def update_user_role_hook(request: Request, login_user: UserPayload, user_id: in
     role_info = RoleDao.get_role_by_ids(old_roles + new_roles)
     group_ids = list(set([role.group_id for role in role_info]))
     role_dict = {one.id: one.role_name for one in role_info}
-    note = "编辑前角色："
+    note = '编辑前角色：'
     for one in old_roles:
-        note += role_dict[one] + "、"
-    note = note.rstrip("、")
-    note += "编辑后角色："
+        note += role_dict[one] + '、'
+    note = note.rstrip('、')
+    note += '编辑后角色：'
     for one in new_roles:
-        note += role_dict[one] + "、"
-    note = note.rstrip("、")
+        note += role_dict[one] + '、'
+    note = note.rstrip('、')
     AuditLogService.update_user(login_user, get_request_ip(request), user_id, group_ids, note)
 
 

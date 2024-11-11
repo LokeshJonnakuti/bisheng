@@ -1,20 +1,19 @@
 from typing import Any, List
 from uuid import UUID
 
-from loguru import logger
-
-from bisheng.api.services.user_service import UserPayload
-from bisheng.database.models.audit_log import AuditLog, SystemId, EventType, ObjectType, AuditLogDao
-from bisheng.database.models.assistant import AssistantDao, Assistant
-from bisheng.database.models.flow import FlowDao, Flow
-from bisheng.database.models.group import GroupDao, Group
-from bisheng.database.models.group_resource import GroupResourceDao, ResourceTypeEnum
 from bisheng.api.errcode.base import UnAuthorizedError
+from bisheng.api.services.user_service import UserPayload
 from bisheng.api.v1.schemas import resp_200
-from bisheng.database.models.knowledge import KnowledgeDao, Knowledge
-from bisheng.database.models.role import RoleDao, Role
-from bisheng.database.models.user import UserDao, User
+from bisheng.database.models.assistant import Assistant, AssistantDao
+from bisheng.database.models.audit_log import AuditLog, AuditLogDao, EventType, ObjectType, SystemId
+from bisheng.database.models.flow import Flow, FlowDao
+from bisheng.database.models.group import Group, GroupDao
+from bisheng.database.models.group_resource import GroupResourceDao, ResourceTypeEnum
+from bisheng.database.models.knowledge import Knowledge, KnowledgeDao
+from bisheng.database.models.role import Role, RoleDao
+from bisheng.database.models.user import User, UserDao
 from bisheng.database.models.user_group import UserGroupDao
+from loguru import logger
 
 
 class AuditLogService:

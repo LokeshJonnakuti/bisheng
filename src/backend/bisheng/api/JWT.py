@@ -1,9 +1,8 @@
 import json
 from typing import List
 
-from pydantic import BaseModel
-
 from bisheng.settings import settings
+from pydantic import BaseModel
 
 # 配置JWT token的有效期
 ACCESS_TOKEN_EXPIRE_TIME = 86400
@@ -15,5 +14,3 @@ class Settings(BaseModel):
     authjwt_token_location: List[str] = ['cookies', 'headers']
     # Disable CSRF Protection for this example. default is True
     authjwt_cookie_csrf_protect: bool = False
-
-

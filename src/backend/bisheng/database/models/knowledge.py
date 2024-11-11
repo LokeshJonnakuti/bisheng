@@ -1,14 +1,13 @@
 from datetime import datetime
 from typing import Any, List, Optional, Tuple
 
-from sqlalchemy import Column, DateTime, and_, text, func
-from sqlmodel import Field, select, or_
-
 from bisheng.database.base import session_getter
 from bisheng.database.models.base import SQLModelSerializable
-from bisheng.database.models.role_access import RoleAccess, AccessType, RoleAccessDao
+from bisheng.database.models.role_access import AccessType, RoleAccess, RoleAccessDao
 from bisheng.database.models.user import UserDao
 from bisheng.database.models.user_role import UserRoleDao
+from sqlalchemy import Column, DateTime, and_, func, text
+from sqlmodel import Field, or_, select
 
 
 class KnowledgeBase(SQLModelSerializable):
