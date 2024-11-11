@@ -2,6 +2,7 @@ import json
 import os
 
 from loguru import logger
+import secrets
 
 os.environ['OPENAI_API_KEY'] = ''
 os.environ['OPENAI_PROXY'] = ''
@@ -240,10 +241,9 @@ def llm_router_with_preprocess():
 
 
 def test_main():
-    import random
     import time
 
-    random.seed(42)
+    secrets.SystemRandom().seed(42)
     from collections import defaultdict
 
     from loguru import logger

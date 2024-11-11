@@ -1,5 +1,4 @@
 import os
-import random
 import json
 import copy
 import pandas as pd
@@ -9,6 +8,7 @@ from langchain.document_loaders import PyPDFLoader
 from langchain_core.prompts import PromptTemplate
 from bisheng_langchain.document_loaders import ElemUnstructuredLoader
 from bisheng_ragas.trainset import TrainsetGenerator
+import secrets
 
 
 prompt_template = """Use the following pieces of context to answer the question at the end. If you don't know the answer, just say that you don't know, don't try to make up an answer.
@@ -81,7 +81,7 @@ class RagQAGenerator(object):
         return all_qa_info
 
     def format_qa_for_sft(self, min_context_num=3, max_context_num=7):
-        random.seed(123)
+        secrets.SystemRandom().seed(123)
         all_qa_info = self.statistic_qa()
         train_samples = []
         test_samples = []
@@ -95,22 +95,21 @@ class RagQAGenerator(object):
                 ground_truth_context = str(eval(qa['ground_truth_context'])[0])
                 contexts.append(ground_truth_context)
             
-            random.shuffle(qa_info)
+            secrets.SystemRandom().shuffle(qa_info)
             for i, qa in enumerate(qa_info):
                 question = qa['question']
                 ground_truth_context = str(eval(qa['ground_truth_context'])[0])
                 ground_truth = str(eval(qa['ground_truth'])[0])
                 
                 # 加入其他干扰context
-                random_number = random.randint(
-                    min(min_context_num, len(contexts)), 
+                random_number = secrets.SystemRandom().randint(min(min_context_num, len(contexts)), 
                     min(max_context_num, len(contexts))
                 )
-                random_context = random.sample(contexts, random_number)
+                random_context = secrets.SystemRandom().sample(contexts, random_number)
                 if ground_truth_context in random_context:
                     random_context.remove(ground_truth_context)
                 # 将当前context随机插入到其他context中
-                insert_position = random.randint(0, len(random_context))
+                insert_position = secrets.SystemRandom().randint(0, len(random_context))
                 random_context.insert(insert_position, ground_truth_context)
 
                 random_context = '\n\n'.join(random_context)
