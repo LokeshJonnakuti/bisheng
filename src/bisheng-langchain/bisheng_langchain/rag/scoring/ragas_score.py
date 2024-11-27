@@ -7,10 +7,10 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 import pandas as pd
-from datasets import Dataset
-from loguru import logger
 from bisheng_ragas import evaluate
 from bisheng_ragas.metrics import AnswerCorrectness, AnswerCorrectnessBisheng, AnswerRecallBisheng
+from datasets import Dataset
+from loguru import logger
 
 
 @dataclass
@@ -57,7 +57,7 @@ class RagScore:
         return df
 
     def ragas_answer_recall_bisheng(self, dataset: Dataset) -> pd.DataFrame:
-        answer_recall =AnswerRecallBisheng(batch_size=self.batch_size, 
+        answer_recall =AnswerRecallBisheng(batch_size=self.batch_size,
                                            whether_gtsplit=self.whether_gtsplit)
         result = evaluate(
             dataset=dataset,
@@ -69,7 +69,7 @@ class RagScore:
 
     def _remove_source(self, pred: str) -> str:
         """去除【1†source】, only for openai assistant"""
-        pattern = re.compile("【(\d+)†source】")
+        pattern = re.compile('【(\d+)†source】')
         match = re.findall(pattern, pred)
         for i in match:
             str_temp = f"【{i}†source】"
@@ -111,18 +111,18 @@ class RagScore:
         if self.gt_split_column:
             gtsplit = df[self.gt_split_column].tolist()
             data: Dict[str, List[Any]] = {
-                "question": questions,
-                "answer": answers,
-                "contexts": contexts,
-                "ground_truths": ground_truths,
+                'question': questions,
+                'answer': answers,
+                'contexts': contexts,
+                'ground_truths': ground_truths,
                 'gt_split_point': gtsplit
             }
         else:
             data: Dict[str, List[Any]] = {
-                "question": questions,
-                "answer": answers,
-                "contexts": contexts,
-                "ground_truths": ground_truths,
+                'question': questions,
+                'answer': answers,
+                'contexts': contexts,
+                'ground_truths': ground_truths,
             }
         # Convert dict to dataset
         dataset = Dataset.from_dict(data)
@@ -134,10 +134,10 @@ class RagScore:
             ragas_result = getattr(self, f'ragas_{metric_name}')(dataset)
             if metric_name =='answer_recall_bisheng':
                 if self.gt_split_column:
-                    df[self.gt_split_column] = ragas_result["gt_split_point"]
+                    df[self.gt_split_column] = ragas_result['gt_split_point']
                 else:
-                    df["gt_split_point"] = ragas_result["gt_split_point"]
-                df["analyse"] = ragas_result["analyse"]
+                    df['gt_split_point'] = ragas_result['gt_split_point']
+                df['analyse'] = ragas_result['analyse']
 
             score_map = dict().fromkeys(self.score_map_keys, ragas_result)
             for metric, scores in score_map.items():
@@ -147,13 +147,13 @@ class RagScore:
                 grouped_df = df.groupby(self.query_type_column)
                 grouped_df = grouped_df.agg({self.question_column: 'count', **{metric: 'mean' for metric in score_map}})
                 grouped_df.rename(columns={self.question_column: '问题个数'}, inplace=True)
-                
+
                 total_question = grouped_df['问题个数'].sum()
                 grouped_df.loc['总计', '问题个数'] = total_question
                 for metric in score_map:
                     grouped_df.loc['总计', metric] = df[metric].sum() / total_question
                 save_group_df[f'{metric_name}_group'] = grouped_df
-                
+
                 print(grouped_df.to_markdown())
 
         # save

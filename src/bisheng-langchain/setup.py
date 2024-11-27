@@ -75,7 +75,7 @@ setuptools.setup(
     url='https://github.com/dataelement/bisheng',
     packages=setuptools.find_packages(exclude=('examples*', 'tests*', 'applications*', 'model_zoo*'),),
     package_data={
-        "bisheng_langchain": ["rag/config/*"]
+        'bisheng_langchain': ['rag/config/*']
     },
     setup_requires=[],
     install_requires=REQUIRED_PACKAGES,

@@ -1,38 +1,38 @@
 import asyncio
-import os
-import uuid
 import io
 import json
-from typing import List
-
-from bisheng.interface.initialize.loading import instantiate_llm
-from fastapi import UploadFile, HTTPException
-import pandas as pd
-from bisheng.settings import settings
+import os
+import uuid
 from collections import defaultdict
 from copy import deepcopy
+from typing import List
 
+import pandas as pd
+from bisheng.api.services.assistant_agent import AssistantAgent
+from bisheng.api.services.flow import FlowService
 from bisheng.api.services.user_service import UserPayload
-from bisheng.api.v1.schemas import (UnifiedResponseModel, resp_200, StreamData, BuildStatus)
+from bisheng.api.utils import build_flow, build_input_keys_response
+from bisheng.api.v1.schemas import BuildStatus, StreamData, UnifiedResponseModel, resp_200
 from bisheng.cache import InMemoryCache
+from bisheng.cache.redis import redis_client
+from bisheng.database.models.assistant import AssistantDao
+from bisheng.database.models.evaluation import (Evaluation, EvaluationDao, EvaluationTaskStatus,
+                                                ExecType)
 from bisheng.database.models.flow import FlowDao
 from bisheng.database.models.flow_version import FlowVersionDao
-from bisheng.database.models.assistant import AssistantDao
-from bisheng.api.services.flow import FlowService
-from bisheng.database.models.evaluation import (Evaluation, EvaluationDao, ExecType, EvaluationTaskStatus)
 from bisheng.database.models.user import UserDao
-from bisheng.utils.minio_client import MinioClient
-from fastapi.encoders import jsonable_encoder
+from bisheng.graph.graph.base import Graph
+from bisheng.interface.initialize.loading import instantiate_llm
+from bisheng.settings import settings
 from bisheng.utils.logger import logger
-from bisheng.api.services.assistant_agent import AssistantAgent
+from bisheng.utils.minio_client import MinioClient
+from bisheng_langchain.gpts.utils import import_by_type
 from bisheng_ragas import evaluate
 from bisheng_ragas.llms.langchain import LangchainLLM
 from bisheng_ragas.metrics import AnswerCorrectnessBisheng
 from datasets import Dataset
-from bisheng_langchain.gpts.utils import import_by_type
-from bisheng.cache.redis import redis_client
-from bisheng.api.utils import build_flow, build_input_keys_response
-from bisheng.graph.graph.base import Graph
+from fastapi import HTTPException, UploadFile
+from fastapi.encoders import jsonable_encoder
 
 flow_data_store = redis_client
 
@@ -175,11 +175,11 @@ class EvaluationService:
         df = pd.read_csv(file_data)
         df = df.dropna(axis=0, how='all').dropna(axis=1, how='all')
         if df.shape[1] < 2:
-            raise ValueError("CSV file must have at least two columns")
+            raise ValueError('CSV file must have at least two columns')
         if df.columns[0] != 'question' or df.columns[1] != 'ground_truth':
             raise ValueError(
                 "CSV file must have 'question' as the first column and 'ground_truth' as the second column")
-        formatted_data = [{"question": row[0], "ground_truth": row[1]} for row in df.values]
+        formatted_data = [{'question': row[0], 'ground_truth': row[1]} for row in df.values]
         return formatted_data
 
     @classmethod
@@ -192,7 +192,7 @@ class EvaluationService:
         try:
             version_info = FlowVersionDao.get_version_by_id(version_id)
             if not version_info:
-                return {"input": ""}
+                return {'input': ''}
 
             # L1 用户，采用build流程
             try:
@@ -206,7 +206,7 @@ class EvaluationService:
 
             except Exception as e:
                 logger.error(f'evaluation task get_input_keys {e}')
-                return {"input": ""}
+                return {'input': ''}
 
             await graph.abuild()
             # Now we  need to check the input_keys to send them to the client
@@ -225,13 +225,13 @@ class EvaluationService:
                         'type': 'file',
                         'id': node.id
                     })
-            if len(input_keys_response.get("input_keys")):
-                input_item = input_keys_response.get("input_keys")[0]
-                del input_item["id"]
+            if len(input_keys_response.get('input_keys')):
+                input_item = input_keys_response.get('input_keys')[0]
+                del input_item['id']
                 return input_item
         finally:
             pass
-        return {"input": ""}
+        return {'input': ''}
 
 
 def add_evaluation_task(evaluation_id: int):
@@ -250,7 +250,7 @@ def add_evaluation_task(evaluation_id: int):
         if evaluation.exec_type == ExecType.FLOW.value:
             flow_version = FlowVersionDao.get_version_by_id(version_id=evaluation.version)
             if not flow_version:
-                raise Exception("Flow version not found")
+                raise Exception('Flow version not found')
             input_keys = asyncio.run(EvaluationService.get_input_keys(flow_id=evaluation.unique_id,
                                                                       version_id=evaluation.version))
             first_key = list(input_keys.keys())[0]
@@ -265,53 +265,53 @@ def add_evaluation_task(evaluation_id: int):
                     tweaks={},
                     index=0,
                     versions=[flow_version]))
-                one["answer"] = flow_result.get(flow_version.id)
+                one['answer'] = flow_result.get(flow_version.id)
                 current_progress += progress_increment
                 redis_client.set(redis_key, round(current_progress))
 
         if evaluation.exec_type == ExecType.ASSISTANT.value:
             assistant = AssistantDao.get_one_assistant(evaluation.unique_id)
             if not assistant:
-                raise Exception("Assistant not found")
-            gpts_agent = AssistantAgent(assistant_info=assistant, chat_id="")
+                raise Exception('Assistant not found')
+            gpts_agent = AssistantAgent(assistant_info=assistant, chat_id='')
             asyncio.run(gpts_agent.init_assistant())
             for index, one in enumerate(csv_data):
                 messages = asyncio.run(gpts_agent.run(one.get('question')))
                 if len(messages):
-                    one["answer"] = messages[0].content
+                    one['answer'] = messages[0].content
                 current_progress += progress_increment
                 redis_client.set(redis_key, round(current_progress))
 
         llm_params = settings.get_default_llm()
         logger.info(f'start evaluate with default llm: {llm_params}')
-        node_type = llm_params.pop('type', "HostQwenChat")  # 兼容旧配置
+        node_type = llm_params.pop('type', 'HostQwenChat')  # 兼容旧配置
         class_object = import_by_type(_type='llms', name=node_type)
         _llm = instantiate_llm(node_type, class_object, llm_params)
         llm = LangchainLLM(_llm)
         data_samples = {
-            "question": [one.get('question') for one in csv_data],
-            "answer": [one.get('answer') for one in csv_data],
-            "ground_truths": [[one.get('ground_truth')] for one in csv_data]
+            'question': [one.get('question') for one in csv_data],
+            'answer': [one.get('answer') for one in csv_data],
+            'ground_truths': [[one.get('ground_truth')] for one in csv_data]
         }
 
         dataset = Dataset.from_dict(data_samples)
         answer_correctness_bisheng = AnswerCorrectnessBisheng(llm=llm)
         score = evaluate(dataset, metrics=[answer_correctness_bisheng])
         df = score.to_pandas()
-        result = df.to_dict(orient="list")
+        result = df.to_dict(orient='list')
 
         question = result.get('question', [])
         columns = [
             # 字段:标题:类型(1:文本 2:数字 3:百分比)
-            ("question", "question", 1),
-            ("ground_truths", "ground_truth", 1),
-            ("answer", "answer", 1),
-            ("statements_num_gt_only", "statements_num_gt_only", 2),
-            ("statements_num_answer_only", "statements_num_answer_only", 2),
-            ("statements_overlap", "statements_overlap", 2),
-            ("answer_recall", "recall", 3),
-            ("answer_precision", "precision", 3),
-            ("answer_f1", "F1", 3)
+            ('question', 'question', 1),
+            ('ground_truths', 'ground_truth', 1),
+            ('answer', 'answer', 1),
+            ('statements_num_gt_only', 'statements_num_gt_only', 2),
+            ('statements_num_answer_only', 'statements_num_answer_only', 2),
+            ('statements_overlap', 'statements_overlap', 2),
+            ('answer_recall', 'recall', 3),
+            ('answer_precision', 'precision', 3),
+            ('answer_f1', 'F1', 3)
         ]
         row_list = []
         tmp_dict = defaultdict(int)

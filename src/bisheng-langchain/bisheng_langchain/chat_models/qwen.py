@@ -60,7 +60,7 @@ def _convert_dict_to_message(_dict: Mapping[str, Any]) -> BaseMessage:
             additional_kwargs = {'function_call': dict(_dict['function_call'])}
         else:
             additional_kwargs = {}
-        if _dict.get("tool_calls"):
+        if _dict.get('tool_calls'):
             additional_kwargs = {'tool_calls': _dict['tool_calls']}
         else:
             additional_kwargs = {}
@@ -69,13 +69,13 @@ def _convert_dict_to_message(_dict: Mapping[str, Any]) -> BaseMessage:
         return SystemMessage(content=_dict['content'])
     elif role == 'function':
         return FunctionMessage(content=_dict['content'], name=_dict['name'])
-    elif role == "tool":
+    elif role == 'tool':
         additional_kwargs = {}
-        if "name" in _dict:
-            additional_kwargs["name"] = _dict["name"]
+        if 'name' in _dict:
+            additional_kwargs['name'] = _dict['name']
         return ToolMessage(
-            content=_dict.get("content", ""),
-            tool_call_id=_dict.get("tool_call_id"),
+            content=_dict.get('content', ''),
+            tool_call_id=_dict.get('tool_call_id'),
             additional_kwargs=additional_kwargs,
         )
     else:
@@ -91,8 +91,8 @@ def _convert_message_to_dict(message: BaseMessage) -> dict:
         message_dict = {'role': 'assistant', 'content': message.content}
         if 'function_call' in message.additional_kwargs:
             message_dict['function_call'] = message.additional_kwargs['function_call']
-        if "tool_calls" in message.additional_kwargs:
-            message_dict["tool_calls"] = message.additional_kwargs["tool_calls"]
+        if 'tool_calls' in message.additional_kwargs:
+            message_dict['tool_calls'] = message.additional_kwargs['tool_calls']
     elif isinstance(message, SystemMessage):
         message_dict = {'role': 'system', 'content': message.content}
     elif isinstance(message, FunctionMessage):
@@ -103,9 +103,9 @@ def _convert_message_to_dict(message: BaseMessage) -> dict:
         }
     elif isinstance(message, ToolMessage):
         message_dict = {
-            "role": "tool",
-            "content": message.content,
-            "tool_call_id": message.tool_call_id,
+            'role': 'tool',
+            'content': message.content,
+            'tool_call_id': message.tool_call_id,
         }
     else:
         raise ValueError(f'Got unknown type {message}')
@@ -214,7 +214,7 @@ class ChatQWen(BaseChatModel):
 
         rsp_dict = _completion_with_retry(**kwargs)
         if 'code' in rsp_dict and rsp_dict['code'] == 'DataInspectionFailed':
-            output_res = {'choices': [{'finish_reason': 'stop', 'message': {'role': 'assistant', 'content': rsp_dict['message']}}]} 
+            output_res = {'choices': [{'finish_reason': 'stop', 'message': {'role': 'assistant', 'content': rsp_dict['message']}}]}
             usage_res = {'total_tokens': 2, 'output_tokens': 1, 'input_tokens': 1}
             return output_res, usage_res
         elif 'output' not in rsp_dict:

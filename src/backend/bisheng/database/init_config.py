@@ -1,8 +1,8 @@
 from typing import Dict, List
 
 import yaml
-from bisheng.database.models.config import Config
 from bisheng.database.base import session_getter
+from bisheng.database.models.config import Config
 from bisheng.settings import parse_key, read_from_conf
 from bisheng.utils.logger import logger
 from sqlmodel import select

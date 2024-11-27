@@ -185,7 +185,7 @@ class FinetuneService:
             return validate_ret
 
         # 调用SFT-backend的API取消任务
-        logger.info(f'start cancel job_id: {job_id}, user: {user.get("user_name")}')
+        logger.info(f'start cancel job_id: {job_id}, user: {user.get('user_name')}')
         sft_ret = SFTBackend.cancel_job(host=parse_server_host(finetune.sft_endpoint), job_id=job_id.hex)
         if not sft_ret[0]:
             logger.error(f'cancel sft job error: job_id: {job_id}, err: {sft_ret[1]}')
@@ -206,7 +206,7 @@ class FinetuneService:
         model_name = cls.delete_published_model(finetune, finetune.rt_endpoint)
 
         # 调用接口删除训练任务
-        logger.info(f'start delete sft job: {job_id}, user: {user.get("user_name")}')
+        logger.info(f'start delete sft job: {job_id}, user: {user.get('user_name')}')
         sft_ret = SFTBackend.delete_job(host=parse_server_host(finetune.sft_endpoint), job_id=job_id.hex,
                                         model_name=model_name)
         if not sft_ret[0]:
@@ -283,7 +283,7 @@ class FinetuneService:
             return validate_ret
 
         # 调用SFT-backend的API接口
-        logger.info(f'start export sft job: {job_id}, user: {user.get("user_name")}')
+        logger.info(f'start export sft job: {job_id}, user: {user.get('user_name')}')
         sft_ret = SFTBackend.publish_job(host=parse_server_host(finetune.sft_endpoint), job_id=job_id.hex,
                                          model_name=finetune.model_name)
         if not sft_ret[0]:
@@ -326,7 +326,7 @@ class FinetuneService:
         cls.delete_published_model(finetune, finetune.rt_endpoint)
 
         # 调用SFT-backend的API接口
-        logger.info(f'start cancel export sft job: {job_id}, user: {user.get("user_name")}')
+        logger.info(f'start cancel export sft job: {job_id}, user: {user.get('user_name')}')
         sft_ret = SFTBackend.cancel_publish_job(host=parse_server_host(finetune.sft_endpoint), job_id=job_id.hex,
                                                 model_name=finetune.model_name)
         if not sft_ret[0]:

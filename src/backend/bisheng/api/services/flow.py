@@ -1,31 +1,29 @@
 import asyncio
 import copy
-from typing import List, Dict, AsyncGenerator
+from typing import AsyncGenerator, Dict, List
 from uuid import UUID
 
-from fastapi.encoders import jsonable_encoder
-from fastapi import Request
-from loguru import logger
-
 from bisheng.api.errcode.base import UnAuthorizedError
-from bisheng.api.errcode.flow import NotFoundVersionError, CurVersionDelError, VersionNameExistsError, \
-    NotFoundFlowError, \
-    FlowOnlineEditError
+from bisheng.api.errcode.flow import (CurVersionDelError, FlowOnlineEditError, NotFoundFlowError,
+                                      NotFoundVersionError, VersionNameExistsError)
 from bisheng.api.services.audit_log import AuditLogService
 from bisheng.api.services.user_service import UserPayload
 from bisheng.api.utils import get_L2_param_from_flow, get_request_ip
-from bisheng.api.v1.schemas import UnifiedResponseModel, resp_200, FlowVersionCreate, FlowCompareReq, resp_500, \
-    StreamData
+from bisheng.api.v1.schemas import (FlowCompareReq, FlowVersionCreate, StreamData,
+                                    UnifiedResponseModel, resp_200, resp_500)
 from bisheng.chat.utils import process_node_data
-from bisheng.database.models.flow import FlowDao, FlowStatus, Flow
-from bisheng.database.models.flow_version import FlowVersionDao, FlowVersionRead, FlowVersion
-from bisheng.database.models.group_resource import GroupResourceDao, ResourceTypeEnum, GroupResource
-from bisheng.database.models.role_access import RoleAccessDao, AccessType
+from bisheng.database.models.flow import Flow, FlowDao, FlowStatus
+from bisheng.database.models.flow_version import FlowVersion, FlowVersionDao, FlowVersionRead
+from bisheng.database.models.group_resource import GroupResource, GroupResourceDao, ResourceTypeEnum
+from bisheng.database.models.role_access import AccessType, RoleAccessDao
 from bisheng.database.models.user import UserDao
 from bisheng.database.models.user_group import UserGroupDao
 from bisheng.database.models.user_role import UserRoleDao
 from bisheng.database.models.variable_value import VariableDao
 from bisheng.processing.process import process_graph_cached, process_tweaks
+from fastapi import Request
+from fastapi.encoders import jsonable_encoder
+from loguru import logger
 
 
 class FlowService:
@@ -189,8 +187,8 @@ class FlowService:
         """
         # 获取用户可见的技能列表
         if user.is_admin():
-            data = FlowDao.get_flows(user.user_id, "admin", name, status, page, page_size)
-            total = FlowDao.count_flows(user.user_id, "admin", name, status)
+            data = FlowDao.get_flows(user.user_id, 'admin', name, status, page, page_size)
+            total = FlowDao.count_flows(user.user_id, 'admin', name, status)
         else:
             user_role = UserRoleDao.get_user_roles(user.user_id)
             role_ids = [role.role_id for role in user_role]
@@ -231,8 +229,8 @@ class FlowService:
             res.append(flow_info)
 
         return resp_200(data={
-            "data": res,
-            "total": total
+            'data': res,
+            'total': total
         })
 
     @classmethod
@@ -304,7 +302,7 @@ class FlowService:
                 else:
                     res[index] = answer
         except Exception as e:
-            return resp_500(message="技能对比错误：{}".format(str(e)))
+            return resp_500(message='技能对比错误：{}'.format(str(e)))
         return resp_200(data=res)
 
     @classmethod
@@ -346,7 +344,7 @@ class FlowService:
                 task_result = result.result
             else:
                 logger.error(f"exec flow node error version_id: {one.id}, answer: {result}")
-                task_result = {"answer": "flow exec error"}
+                task_result = {'answer': 'flow exec error'}
 
             answer_result[one.id] = list(task_result.values())[0]
 

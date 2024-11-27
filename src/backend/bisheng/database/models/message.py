@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Dict, Optional, List
+from typing import Dict, List, Optional
 from uuid import UUID
 
 from bisheng.database.base import session_getter

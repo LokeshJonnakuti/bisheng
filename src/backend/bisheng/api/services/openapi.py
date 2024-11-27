@@ -11,7 +11,7 @@ class OpenApiSchema:
         self.title = self.info['title']
         self.description = self.info.get('description', '')
 
-        self.default_server = ""
+        self.default_server = ''
         self.apis = []
 
     def parse_server(self) -> str:
@@ -34,14 +34,14 @@ class OpenApiSchema:
         for path, path_info in paths.items():
             for method, method_info in path_info.items():
                 one_api_info = {
-                    "path": path,
-                    "method": method
+                    'path': path,
+                    'method': method
                 }
                 if method not in ['get', 'post', 'put', 'delete']:
                     continue
-                one_api_info["description"] = method_info.get('description', '') or method_info.get('summary', '')
-                one_api_info["operationId"] = method_info['operationId']
-                one_api_info["parameters"] = method_info.get('parameters', [])
+                one_api_info['description'] = method_info.get('description', '') or method_info.get('summary', '')
+                one_api_info['operationId'] = method_info['operationId']
+                one_api_info['parameters'] = method_info.get('parameters', [])
                 self.apis.append(one_api_info)
         return self.apis
 
@@ -52,14 +52,14 @@ class OpenApiSchema:
         headers = {}
         if auth_method == AuthMethod.API_KEY.value:
             headers = {
-                "Authorization": f"{auth_type} {api_key}"
+                'Authorization': f"{auth_type} {api_key}"
             }
 
         # 返回初始化 openapi所需的入参
         params = {
-            "params": json.loads(extra),
-            "headers": headers,
-            "url": server_host,
-            "description": name + description if description else name
+            'params': json.loads(extra),
+            'headers': headers,
+            'url': server_host,
+            'description': name + description if description else name
         }
         return params

@@ -1,10 +1,7 @@
 import inspect
 from typing import Any, Dict, List, Optional
 
-from langchain.callbacks.manager import (
-    AsyncCallbackManagerForChainRun,
-    CallbackManagerForChainRun,
-)
+from langchain.callbacks.manager import AsyncCallbackManagerForChainRun, CallbackManagerForChainRun
 from langchain.chains.base import Chain
 from langchain.schema import BaseRetriever, Document
 from pydantic import Field
@@ -52,7 +49,7 @@ class RetrievalChain(Chain):
         """
         _output_keys = [self.output_key]
         if self.return_source_documents:
-            _output_keys = _output_keys + ["source_documents"]
+            _output_keys = _output_keys + ['source_documents']
         return _output_keys
 
     def _call(
@@ -62,14 +59,14 @@ class RetrievalChain(Chain):
     ) -> Dict[str, Any]:
         _run_manager = run_manager or CallbackManagerForChainRun.get_noop_manager()
         question = inputs[self.input_key]
-        accepts_run_manager = "run_manager" in inspect.signature(self._get_docs).parameters
+        accepts_run_manager = 'run_manager' in inspect.signature(self._get_docs).parameters
         if accepts_run_manager:
             docs = self._get_docs(question, run_manager=_run_manager)
         else:
             docs = self._get_docs(question)  # type: ignore[call-arg]
 
         if self.return_source_documents:
-            return {self.output_key: docs, "source_documents": docs}
+            return {self.output_key: docs, 'source_documents': docs}
         else:
             return {self.output_key: docs}
 
@@ -80,13 +77,13 @@ class RetrievalChain(Chain):
     ) -> Dict[str, Any]:
         _run_manager = run_manager or AsyncCallbackManagerForChainRun.get_noop_manager()
         question = inputs[self.input_key]
-        accepts_run_manager = "run_manager" in inspect.signature(self._aget_docs).parameters
+        accepts_run_manager = 'run_manager' in inspect.signature(self._aget_docs).parameters
         if accepts_run_manager:
             docs = await self._aget_docs(question, run_manager=_run_manager)
         else:
             docs = await self._aget_docs(question)  # type: ignore[call-arg]
 
         if self.return_source_documents:
-            return {self.output_key: docs, "source_documents": docs}
+            return {self.output_key: docs, 'source_documents': docs}
         else:
             return {self.output_key: docs}

@@ -14,7 +14,7 @@ class CalculatorInput(BaseModel):
     )
 
 
-@tool("calculator", args_schema=CalculatorInput)
+@tool('calculator', args_schema=CalculatorInput)
 def calculator(expression):
     """Useful to perform any mathematical calculations,
     like sum, minus, multiplication, division, etc
@@ -22,4 +22,4 @@ def calculator(expression):
     try:
         return eval(expression)
     except SyntaxError:
-        return "Error: Invalid syntax in mathematical expression"
+        return 'Error: Invalid syntax in mathematical expression'

@@ -23,7 +23,7 @@ class RedisClient:
                 cluster_url = ''
                 if 'startup_nodes' in redis_conf:
                     first_node = redis_conf['startup_nodes'][0]
-                    cluster_url = f'redis://{first_node["host"]}:{first_node["port"]}'
+                    cluster_url = f'redis://{first_node['host']}:{first_node['port']}'
                     redis_conf['startup_nodes'] = [
                         ClusterNode(node.get('host'), node.get('port'))
                         for node in redis_conf['startup_nodes']

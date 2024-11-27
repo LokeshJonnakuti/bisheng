@@ -4,12 +4,9 @@ import json
 import time
 import uuid
 from collections import defaultdict
+from queue import Queue
 from typing import Any, Dict, List
 from uuid import UUID
-from queue import Queue
-
-from loguru import logger
-from fastapi import WebSocket, WebSocketDisconnect, status, Request
 
 from bisheng.api.services.audit_log import AuditLogService
 from bisheng.api.services.user_service import UserPayload
@@ -29,6 +26,8 @@ from bisheng.processing.process import process_tweaks
 from bisheng.utils.threadpool import ThreadPoolManager, thread_pool
 from bisheng.utils.util import get_cache_key
 from bisheng_langchain.input_output.output import Report
+from fastapi import Request, WebSocket, WebSocketDisconnect, status
+from loguru import logger
 
 
 class ChatHistory(Subject):
@@ -407,8 +406,8 @@ class ChatManager:
                 if len(res) <= 1:  # 说明是新建会话
                     websocket = self.active_connections[key]
                     login_user = UserPayload(**{
-                        "user_id": user_id,
-                        "user_name": UserDao.get_user(user_id).user_name,
+                        'user_id': user_id,
+                        'user_name': UserDao.get_user(user_id).user_name,
                     })
                     AuditLogService.create_chat_flow(login_user, get_request_ip(websocket), flow_id)
         start_resp.type = 'start'

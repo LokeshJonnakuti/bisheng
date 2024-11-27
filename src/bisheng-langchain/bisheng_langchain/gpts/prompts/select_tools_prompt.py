@@ -25,5 +25,5 @@ SYS_MSG = """
 HUMAN_MSG = """
 任务名: {task_name}
 任务描述: {task_description}
-建议的工具: 
+建议的工具:
 """
