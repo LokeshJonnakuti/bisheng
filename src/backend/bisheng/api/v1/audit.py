@@ -1,11 +1,10 @@
 from datetime import datetime
-from typing import Optional, List
+from typing import List, Optional
 
-from fastapi import APIRouter, Query, Depends
-
+from bisheng.api.services.audit_log import AuditLogService
 from bisheng.api.services.user_service import UserPayload, get_login_user
 from bisheng.api.v1.schemas import UnifiedResponseModel
-from bisheng.api.services.audit_log import AuditLogService
+from fastapi import APIRouter, Depends, Query
 
 router = APIRouter(prefix='/audit', tags=['AuditLog'])
 

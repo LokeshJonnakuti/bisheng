@@ -1,5 +1,6 @@
 import json
 import os
+
 import numpy as np
 import torch
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
@@ -25,8 +26,8 @@ def min_edit_distance(a, b):
 
 
 def is_matched(text0, text1, thrd=10):
-    text0.replace(" ", "").replace("\n", "")
-    text1.replace(" ", "").replace("\n", "")
+    text0.replace(' ', '').replace('\n', '')
+    text1.replace(' ', '').replace('\n', '')
     dist = min_edit_distance(text0, text1)
     if dist < thrd:
         return True
@@ -42,9 +43,9 @@ def match_score(chunk, query):
     with torch.no_grad():
         inputs = tokenizer(pairs, padding=True, truncation=True, return_tensors='pt', max_length=512).to('cuda:2')
         scores = model(**inputs, return_dict=True).logits.view(-1, ).float()
-        scores = torch.sigmoid(scores) 
+        scores = torch.sigmoid(scores)
         scores = scores.cpu().numpy()
-        
+
     return scores[0]
 
 
@@ -81,28 +82,28 @@ def calc_precision_recall(d):
     """
     计算分数
     """
-    d_ves = d["all_chunks"][:10]
-    d_es = d["all_chunks"][10:]
+    d_ves = d['all_chunks'][:10]
+    d_es = d['all_chunks'][10:]
     all_chunks = []
     for i in range(len(d_es)):
         all_chunks.append(d_es[i])
         all_chunks.append(d_ves[i])
     all_chunks.extend(d_ves[i+1:])
-    d["all_chunks"] = all_chunks
-    
+    d['all_chunks'] = all_chunks
+
     sort_filter_all_chunks_method1(d)
-    NCHUNK = len(d["chunks"])
-    NCHUNK_ALL = len(d["all_chunks"])
+    NCHUNK = len(d['chunks'])
+    NCHUNK_ALL = len(d['all_chunks'])
     print('chunks:', NCHUNK, 'all_chunks:', NCHUNK_ALL)
 
     scores = np.zeros((NCHUNK, NCHUNK_ALL))
     for j in range(NCHUNK):
         for i in range(NCHUNK):
-            if d["chunks"][j]["text"] == d["all_chunks"][i]['text']:
+            if d['chunks'][j]['text'] == d['all_chunks'][i]['text']:
                 scores[j][i] = 1
-            elif abs(len(d["chunks"][j]["text"]) - len(d["all_chunks"][i]['text'])) > 10:
+            elif abs(len(d['chunks'][j]['text']) - len(d['all_chunks'][i]['text'])) > 10:
                 scores[j][i] = 0
-            elif is_matched(d["chunks"][j]["text"], d["all_chunks"][i]['text']):
+            elif is_matched(d['chunks'][j]['text'], d['all_chunks'][i]['text']):
                 scores[j][i] = 1
 
     N_gt = NCHUNK
@@ -124,7 +125,7 @@ nquestion = 0
 for d in retriever_gt_list:
     recall, N_gt, N_right, N_all = calc_precision_recall(d)
     mFieldRecall += recall
-    D_SCORES[d["question"]] = {'recall': recall}
+    D_SCORES[d['question']] = {'recall': recall}
     total_N_gt += N_gt
     total_N_right += N_right
     total_N_all += N_all

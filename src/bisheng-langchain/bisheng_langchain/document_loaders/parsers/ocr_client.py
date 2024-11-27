@@ -1,8 +1,9 @@
 # import base64
-import copy
-import requests
 import base64
+import copy
 from typing import Any, Iterator, List, Mapping, Optional, Union
+
+import requests
 
 
 class OCRClient(object):
@@ -50,4 +51,3 @@ class OCRClient(object):
             return r.json()
         except Exception as e:
             return {'status_code': 400, 'status_message': str(e)}
-

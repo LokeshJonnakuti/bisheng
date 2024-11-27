@@ -1,18 +1,15 @@
 """
-Ensemble retriever that ensemble the results of 
+Ensemble retriever that ensemble the results of
 multiple retrievers by using weighted  Reciprocal Rank Fusion
 """
 
 from typing import Any, Dict, List
 
+from langchain.callbacks.manager import (AsyncCallbackManagerForRetrieverRun,
+                                         CallbackManagerForRetrieverRun)
 from langchain_core.documents import Document
 from langchain_core.pydantic_v1 import root_validator
 from langchain_core.retrievers import BaseRetriever
-
-from langchain.callbacks.manager import (
-    AsyncCallbackManagerForRetrieverRun,
-    CallbackManagerForRetrieverRun,
-)
 
 
 class EnsembleRetriever(BaseRetriever):
@@ -35,9 +32,9 @@ class EnsembleRetriever(BaseRetriever):
 
     @root_validator(pre=True)
     def set_weights(cls, values: Dict[str, Any]) -> Dict[str, Any]:
-        if not values.get("weights"):
-            n_retrievers = len(values["retrievers"])
-            values["weights"] = [1 / n_retrievers] * n_retrievers
+        if not values.get('weights'):
+            n_retrievers = len(values['retrievers'])
+            values['weights'] = [1 / n_retrievers] * n_retrievers
         return values
 
     def _get_relevant_documents(
@@ -162,7 +159,7 @@ class EnsembleRetriever(BaseRetriever):
                     scores in descending order.
         """
         if len(doc_lists) != len(self.weights):
-            raise ValueError("Number of rank lists must be equal to the number of weights.")
+            raise ValueError('Number of rank lists must be equal to the number of weights.')
 
         # Create a union of all unique documents in the input doc_lists
         all_documents = set()

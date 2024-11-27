@@ -2,19 +2,18 @@
 import json
 from typing import Annotated, List, Optional
 
-from fastapi import APIRouter, Body, Depends, HTTPException, Query, Request
-from fastapi_jwt_auth import AuthJWT
-
 from bisheng.api.errcode.base import UnAuthorizedError
 from bisheng.api.services.role_group_service import RoleGroupService
 from bisheng.api.services.user_service import UserPayload, get_login_user
 from bisheng.api.utils import check_permissions
 from bisheng.api.v1.schemas import UnifiedResponseModel, resp_200
+from bisheng.database.models.group import Group, GroupCreate, GroupRead
 from bisheng.database.models.group_resource import ResourceTypeEnum
 from bisheng.database.models.role import RoleDao
-from bisheng.database.models.group import Group, GroupCreate, GroupRead
 from bisheng.database.models.user import User
 from bisheng.database.models.user_group import UserGroupDao, UserGroupRead
+from fastapi import APIRouter, Body, Depends, HTTPException, Query, Request
+from fastapi_jwt_auth import AuthJWT
 
 router = APIRouter(prefix='/group', tags=['User'], dependencies=[Depends(get_login_user)])
 
@@ -171,15 +170,15 @@ async def get_group_resources(*,
         page_size=page_size,
         page_num=page_num)
     return resp_200(data={
-        "data": res,
-        "total": total
+        'data': res,
+        'total': total
     })
 
 
-@router.get("/roles", response_model=UnifiedResponseModel)
+@router.get('/roles', response_model=UnifiedResponseModel)
 async def get_group_roles(*,
-                          group_id: List[int] = Query(..., description="用户组ID列表"),
-                          keyword: str = Query(None, description="搜索关键字"),
+                          group_id: List[int] = Query(..., description='用户组ID列表'),
+                          keyword: str = Query(None, description='搜索关键字'),
                           page: int = 0,
                           limit: int = 0,
                           user: UserPayload = Depends(get_login_user)):
@@ -194,6 +193,6 @@ async def get_group_roles(*,
     total = RoleDao.count_role_by_groups(group_id, keyword)
 
     return resp_200(data={
-        "data": role_list,
-        "total": total
+        'data': role_list,
+        'total': total
     })

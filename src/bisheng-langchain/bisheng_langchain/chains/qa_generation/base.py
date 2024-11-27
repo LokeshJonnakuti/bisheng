@@ -1,20 +1,19 @@
 from __future__ import annotations
 
 import json
-import re
 import logging
-from langchain.docstore.document import Document
+import re
 from typing import Any, Dict, List, Optional
 
+from langchain.chains.base import Chain
+from langchain.chains.llm import LLMChain
+from langchain.chains.qa_generation.prompt import CHAT_PROMPT, PROMPT, PROMPT_SELECTOR
+from langchain.docstore.document import Document
 from langchain_core.callbacks import CallbackManagerForChainRun
 from langchain_core.language_models import BaseLanguageModel
 from langchain_core.prompts import BasePromptTemplate, ChatPromptTemplate
 from langchain_core.pydantic_v1 import Field
 from langchain_text_splitters import RecursiveCharacterTextSplitter, TextSplitter
-
-from langchain.chains.base import Chain
-from langchain.chains.llm import LLMChain
-from langchain.chains.qa_generation.prompt import PROMPT_SELECTOR, CHAT_PROMPT, PROMPT
 
 logger = logging.getLogger(__name__)
 
@@ -41,15 +40,15 @@ class QAGenerationChain(Chain):
     """Number of questions to generate."""
     text_splitter: TextSplitter = Field(
         default=RecursiveCharacterTextSplitter(
-            separators=["\n\n", "\n", " ", ""],
+            separators=['\n\n', '\n', ' ', ''],
             chunk_size=1000,
             chunk_overlap=100,
         )
     )
     """Text splitter that splits the input into chunks."""
-    input_key: str = "begin"
+    input_key: str = 'begin'
     """Key of the input to the chain."""
-    output_key: str = "questions"
+    output_key: str = 'questions'
     """Key of the output of the chain."""
 
     @classmethod
@@ -76,7 +75,7 @@ class QAGenerationChain(Chain):
         _prompt = PROMPT_SELECTOR.get_prompt(llm) if prompt is None else prompt
         chain = LLMChain(llm=llm, prompt=_prompt)
         text_splitter = RecursiveCharacterTextSplitter(
-            separators=["\n\n", "\n", " ", ""],
+            separators=['\n\n', '\n', ' ', ''],
             chunk_size=chunk_size,
             chunk_overlap=50,
         )
@@ -108,7 +107,7 @@ class QAGenerationChain(Chain):
         qa_i = 0
         for doc in docs:
             try:
-                results = self.llm_chain.generate([{"text": doc.page_content}], run_manager=run_manager)
+                results = self.llm_chain.generate([{'text': doc.page_content}], run_manager=run_manager)
                 res = results.generations[0]
                 qa += res[0].text
                 qa_i += 1

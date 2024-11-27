@@ -1,15 +1,15 @@
 from typing import List, Optional
 from uuid import UUID
 
-from loguru import logger
-from fastapi import APIRouter, HTTPException, Depends
-from sqlmodel import delete, select
-
 from bisheng.api.services.user_service import get_login_user
 from bisheng.api.v1.schemas import UnifiedResponseModel, resp_200
 from bisheng.database.base import session_getter
 from bisheng.database.models.flow_version import FlowVersionDao
-from bisheng.database.models.variable_value import Variable, VariableCreate, VariableRead, VariableDao
+from bisheng.database.models.variable_value import (Variable, VariableCreate, VariableDao,
+                                                    VariableRead)
+from fastapi import APIRouter, Depends, HTTPException
+from loguru import logger
+from sqlmodel import delete, select
 
 # build router
 router = APIRouter(prefix='/variable', tags=['variable'])
@@ -45,7 +45,7 @@ def post_variable(variable: Variable):
             session.refresh(db_variable)
         return resp_200(db_variable)
     except Exception as e:
-        logger.exception("post variable error: ")
+        logger.exception('post variable error: ')
         return HTTPException(status_code=500, detail=str(e))
 
 

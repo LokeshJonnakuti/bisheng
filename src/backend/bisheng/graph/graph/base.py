@@ -60,7 +60,7 @@ class Graph:
         try:
             nodes = payload['nodes']
             if len(nodes) == 0:
-                raise Exception("At least one node is required")
+                raise Exception('At least one node is required')
             edges = payload['edges']
             return cls(nodes, edges)
         except KeyError as exc:

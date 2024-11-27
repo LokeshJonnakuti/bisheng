@@ -22,7 +22,7 @@ from bisheng.processing.process import process_graph_cached, process_tweaks
 from bisheng.services.deps import get_session_service, get_task_service
 from bisheng.services.task.service import TaskService
 from bisheng.utils.logger import logger
-from fastapi import APIRouter, Body, Depends, HTTPException, UploadFile, Request
+from fastapi import APIRouter, Body, Depends, HTTPException, Request, UploadFile
 from sqlmodel import select
 
 try:
@@ -106,7 +106,7 @@ async def get_web_config():
     if not web_conf:
         return resp_200(data='')
     return resp_200(data={
-        "value": web_conf.value
+        'value': web_conf.value
     })
 
 
@@ -123,7 +123,7 @@ async def update_web_config(request: Request,
         web_conf.value = value
     ConfigDao.insert_config(web_conf)
     return resp_200(data={
-        "value": web_conf.value
+        'value': web_conf.value
     })
 
 

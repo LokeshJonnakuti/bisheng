@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional, List
+from typing import List, Optional
 from uuid import UUID
 
 from bisheng.database.base import session_getter
@@ -7,7 +7,7 @@ from bisheng.database.models.base import SQLModelSerializable
 # if TYPE_CHECKING:
 from pydantic import validator
 from sqlalchemy import Column, DateTime, text
-from sqlmodel import Field, select, or_
+from sqlmodel import Field, or_, select
 
 
 class VariableBase(SQLModelSerializable):
@@ -104,4 +104,3 @@ class VariableDao(Variable):
                 session.add(new_version)
             session.commit()
             return old_version
-

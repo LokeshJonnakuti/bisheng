@@ -1,26 +1,22 @@
 import argparse
 import copy
 import inspect
-import time
 import os
+import time
 from collections import defaultdict
 
 import httpx
 import pandas as pd
 import yaml
-from loguru import logger
-from tqdm import tqdm
+from bisheng_langchain.rag.init_retrievers import (BaselineVectorRetriever, KeywordRetriever,
+                                                   MixRetriever, SmallerChunksVectorRetriever)
+from bisheng_langchain.rag.scoring.ragas_score import RagScore
+from bisheng_langchain.rag.utils import import_by_type, import_class
 from bisheng_langchain.retrievers import EnsembleRetriever
 from bisheng_langchain.vectorstores import ElasticKeywordsSearch, Milvus
 from langchain.chains.question_answering import load_qa_chain
-from bisheng_langchain.rag.init_retrievers import (
-    BaselineVectorRetriever,
-    KeywordRetriever,
-    MixRetriever,
-    SmallerChunksVectorRetriever,
-)
-from bisheng_langchain.rag.scoring.ragas_score import RagScore
-from bisheng_langchain.rag.utils import import_by_type, import_class
+from loguru import logger
+from tqdm import tqdm
 
 
 class BishengRagPipeline:
@@ -61,8 +57,8 @@ class BishengRagPipeline:
         self.vector_store = Milvus(
             embedding_function=self.embeddings,
             connection_args={
-                "host": self.params['milvus']['host'],
-                "port": self.params['milvus']['port'],
+                'host': self.params['milvus']['host'],
+                'port': self.params['milvus']['port'],
             },
         )
 
@@ -256,7 +252,7 @@ class BishengRagPipeline:
 
             # question answer
             try:
-                ans = qa_chain({"input_documents": docs, "question": question}, return_only_outputs=False)
+                ans = qa_chain({'input_documents': docs, 'question': question}, return_only_outputs=False)
             except Exception as e:
                 logger.error(f'question: {question}\nerror: {e}')
                 ans = {'output_text': str(e)}

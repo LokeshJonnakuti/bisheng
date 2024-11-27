@@ -3,7 +3,8 @@ from typing import Any, Dict, List, Optional
 import requests
 from langchain_core.embeddings import Embeddings
 from langchain_core.pydantic_v1 import BaseModel, Extra, Field
-DEFAULT_Multilingual_MODEL = "thenlper/gte-large-zh"
+
+DEFAULT_Multilingual_MODEL = 'thenlper/gte-large-zh'
 
 
 class HuggingFaceGteEmbeddings(BaseModel, Embeddings):
@@ -20,7 +21,7 @@ class HuggingFaceGteEmbeddings(BaseModel, Embeddings):
             model_kwargs = {'device': 'cpu'}
             encode_kwargs = {'normalize_embeddings': True}
             hf = HuggingFaceBgeEmbeddings(
-                
+
                 model_name=model_name,
                 model_kwargs=model_kwargs,
                 encode_kwargs=encode_kwargs
@@ -48,8 +49,8 @@ class HuggingFaceGteEmbeddings(BaseModel, Embeddings):
 
         except ImportError as exc:
             raise ImportError(
-                "Could not import sentence_transformers python package. "
-                "Please install it with `pip install sentence_transformers`."
+                'Could not import sentence_transformers python package. '
+                'Please install it with `pip install sentence_transformers`.'
             ) from exc
 
         self.client = sentence_transformers.SentenceTransformer(
@@ -72,7 +73,7 @@ class HuggingFaceGteEmbeddings(BaseModel, Embeddings):
         Returns:
             List of embeddings, one for each text.
         """
-        texts = [t.replace("\n", " ") for t in texts]
+        texts = [t.replace('\n', ' ') for t in texts]
         embeddings = self.client.encode(texts, **self.encode_kwargs)
         return embeddings.tolist()
 
@@ -85,11 +86,7 @@ class HuggingFaceGteEmbeddings(BaseModel, Embeddings):
         Returns:
             Embeddings for the text.
         """
-        text = text.replace("\n", " ")
+        text = text.replace('\n', ' ')
         embedding = self.client.encode(text, **self.encode_kwargs
         )
         return embedding.tolist()
-
-
-
-

@@ -14,6 +14,6 @@ Fifthly, Write 'Answer:' followed by a response to the user's last input. Use th
 Finally, Write 'Grounded answer:' followed by a response to the user's last input in high quality natural english. Use the symbols <co: doc> and </co: doc> to indicate when a fact comes from a document in the search result, e.g <co: 4>my fact</co: 4> for a fact from document 4.
 
 Additional instructions to note:
-- If the user's question is in Chinese, please answer it in Chinese. 
+- If the user's question is in Chinese, please answer it in Chinese.
 - 当问题中有涉及到时间信息时，比如最近6个月、昨天、去年等，你需要用时间工具查询时间信息。
 """.format(preamble=preamble)

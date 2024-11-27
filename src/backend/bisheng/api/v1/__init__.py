@@ -1,7 +1,9 @@
 from bisheng.api.v1.assistant import router as assistant_router
+from bisheng.api.v1.audit import router as audit_router
 from bisheng.api.v1.chat import router as chat_router
 from bisheng.api.v1.component import router as component_router
 from bisheng.api.v1.endpoints import router as endpoints_router
+from bisheng.api.v1.evaluation import router as evaluation_router
 from bisheng.api.v1.finetune import router as finetune_router
 from bisheng.api.v1.flows import router as flows_router
 from bisheng.api.v1.knowledge import router as knowledge_router
@@ -13,8 +15,6 @@ from bisheng.api.v1.user import router as user_router
 from bisheng.api.v1.usergroup import router as group_router
 from bisheng.api.v1.validate import router as validate_router
 from bisheng.api.v1.variable import router as variable_router
-from bisheng.api.v1.audit import router as audit_router
-from bisheng.api.v1.evaluation import router as evaluation_router
 
 __all__ = [
     'chat_router',

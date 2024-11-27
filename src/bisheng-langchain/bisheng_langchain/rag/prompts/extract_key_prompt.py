@@ -1,6 +1,5 @@
 from langchain.prompts.prompt import PromptTemplate
 
-
 EXTRACT_KEY_PROMPT = PromptTemplate(
     input_variables=['question'],
     template="""分析给定Question，提取Question中包含的KeyWords，输出列表形式

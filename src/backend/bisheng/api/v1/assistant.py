@@ -1,24 +1,24 @@
 import hashlib
 import json
-from typing import List, Optional, Any, Dict
+from typing import Any, Dict, List, Optional
 from uuid import UUID
 
 import yaml
-from bisheng_langchain.gpts.tools.api_tools.openapi import OpenApiTools
-
 from bisheng.api.services.assistant import AssistantService
 from bisheng.api.services.openapi import OpenApiSchema
 from bisheng.api.services.user_service import UserPayload, get_login_user
 from bisheng.api.utils import get_url_content
 from bisheng.api.v1.schemas import (AssistantCreateReq, AssistantInfo, AssistantUpdateReq,
-                                    StreamData, UnifiedResponseModel, resp_200, resp_500, DeleteToolTypeReq,
-                                    TestToolReq)
+                                    DeleteToolTypeReq, StreamData, TestToolReq,
+                                    UnifiedResponseModel, resp_200, resp_500)
 from bisheng.chat.manager import ChatManager
 from bisheng.chat.types import WorkType
 from bisheng.database.models.assistant import Assistant
-from bisheng.database.models.gpts_tools import GptsToolsTypeRead, GptsTools
+from bisheng.database.models.gpts_tools import GptsTools, GptsToolsTypeRead
 from bisheng.utils.logger import logger
-from fastapi import APIRouter, Body, Depends, HTTPException, Query, WebSocket, WebSocketException, Request
+from bisheng_langchain.gpts.tools.api_tools.openapi import OpenApiTools
+from fastapi import (APIRouter, Body, Depends, HTTPException, Query, Request, WebSocket,
+                     WebSocketException)
 from fastapi import status as http_status
 from fastapi.responses import StreamingResponse
 from fastapi_jwt_auth import AuthJWT
@@ -184,13 +184,13 @@ async def get_tool_schema(*,
             file_content = await get_url_content(download_url)
         except Exception as e:
             logger.exception(f'file {download_url} download error')
-            return resp_500(message="url文件下载失败：" + str(e))
+            return resp_500(message='url文件下载失败：' + str(e))
 
     if not file_content:
-        return resp_500(message="schema内容不能为空")
+        return resp_500(message='schema内容不能为空')
     # 根据文件内容是否以`{`开头判断用什么解析方式
     try:
-        if file_content.startswith("{"):
+        if file_content.startswith('{'):
             res = json.loads(file_content)
         else:
             res = yaml.safe_load(file_content)
@@ -202,7 +202,7 @@ async def get_tool_schema(*,
     try:
         schema = OpenApiSchema(res)
         schema.parse_server()
-        if not schema.default_server.startswith(("http", "https")):
+        if not schema.default_server.startswith(('http', 'https')):
             return resp_500(message=f"server中的url必须以http或者https开头: {schema.default_server}")
         tool_type = GptsToolsTypeRead(name=schema.title, description=schema.description,
                                       is_preset=0, is_delete=0, server_host=schema.default_server,
@@ -213,20 +213,20 @@ async def get_tool_schema(*,
             tool_type.children.append(GptsTools(
                 name=one['operationId'],
                 desc=one['description'],
-                tool_key=hashlib.md5(one['operationId'].encode("utf-8")).hexdigest(),
+                tool_key=hashlib.md5(one['operationId'].encode('utf-8')).hexdigest(),
                 is_preset=0,
                 is_delete=0,
-                api_params=one["parameters"],
+                api_params=one['parameters'],
                 extra=json.dumps(one, ensure_ascii=False),
             ))
         return resp_200(data=tool_type)
     except Exception as e:
         logger.exception(f'openapi schema parse error')
-        return resp_500(message="openapi schema解析失败：" + str(e))
+        return resp_500(message='openapi schema解析失败：' + str(e))
 
 
 @router.post('/tool_list', response_model=UnifiedResponseModel[GptsToolsTypeRead])
-def add_tool_type(*, req: Dict = Body(default={}, description="openapi解析后的工具对象"),
+def add_tool_type(*, req: Dict = Body(default={}, description='openapi解析后的工具对象'),
                   login_user: UserPayload = Depends(get_login_user)):
     """ 新增自定义tool """
     req = GptsToolsTypeRead(**req)
@@ -236,7 +236,7 @@ def add_tool_type(*, req: Dict = Body(default={}, description="openapi解析后�
 @router.put('/tool_list', response_model=UnifiedResponseModel[GptsToolsTypeRead])
 def update_tool_type(*,
                      login_user: UserPayload = Depends(get_login_user),
-                     req: Dict = Body(default={}, description="通过openapi 解析后的内容，包含类别的唯一ID")):
+                     req: Dict = Body(default={}, description='通过openapi 解析后的内容，包含类别的唯一ID')):
     """ 更新自定义tool """
     req = GptsToolsTypeRead(**req)
     return AssistantService.update_gpts_tools(login_user, req)

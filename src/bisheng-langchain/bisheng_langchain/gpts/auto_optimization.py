@@ -3,11 +3,7 @@ import os
 import re
 
 import httpx
-from bisheng_langchain.gpts.prompts import (
-    ASSISTANT_PROMPT_OPT,
-    BREIF_DES_PROMPT,
-    OPENDIALOG_PROMPT,
-)
+from bisheng_langchain.gpts.prompts import ASSISTANT_PROMPT_OPT, BREIF_DES_PROMPT, OPENDIALOG_PROMPT
 from langchain_core.language_models.base import LanguageModelLike
 from langchain_openai.chat_models import ChatOpenAI
 from loguru import logger

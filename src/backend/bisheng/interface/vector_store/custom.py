@@ -1,19 +1,18 @@
 from abc import ABC
-from typing import Optional, Any, List, Tuple, Dict, TYPE_CHECKING, Iterable, Callable
+from typing import TYPE_CHECKING, Any, Callable, Dict, Iterable, List, Optional, Tuple
 
 import jieba
+from bisheng_langchain.vectorstores.elastic_keywords_search import DEFAULT_PROMPT
+from bisheng_langchain.vectorstores.milvus import DEFAULT_MILVUS_CONNECTION
 from langchain.chains.llm import LLMChain
+from langchain.docstore.document import Document
+from langchain.embeddings.base import Embeddings
+from langchain.utils import get_from_dict_or_env
+from langchain.vectorstores.base import VectorStore
+from langchain_community.vectorstores.milvus import Milvus as MilvusLangchain
 from langchain_core.language_models import BaseLLM
 from langchain_core.prompts import PromptTemplate
-from langchain.utils import get_from_dict_or_env
-from langchain.embeddings.base import Embeddings
-from langchain_community.vectorstores.milvus import Milvus as MilvusLangchain, Milvus
-from langchain.docstore.document import Document
-from langchain.vectorstores.base import VectorStore
 from loguru import logger
-
-from bisheng_langchain.vectorstores.milvus import DEFAULT_MILVUS_CONNECTION
-from bisheng_langchain.vectorstores.elastic_keywords_search import DEFAULT_PROMPT
 
 if TYPE_CHECKING:
     from elasticsearch import Elasticsearch  # noqa: F401
@@ -106,7 +105,7 @@ class MilvusWithPermissionCheck(MilvusLangchain):
             raise e
 
         if not self.col:
-            logger.warning("No collection found, please confirm user have knowledge access")
+            logger.warning('No collection found, please confirm user have knowledge access')
             # raise ValueError("No collection found, please confirm collection name correctly.")
         # Initialize the vector store
         self._init()
@@ -181,7 +180,7 @@ class MilvusWithPermissionCheck(MilvusLangchain):
             metadatas: Optional[List[dict]] = None,
             collection_name: list[str] = None,
             connection_args: dict[str, Any] = DEFAULT_MILVUS_CONNECTION,
-            consistency_level: str = "Session",
+            consistency_level: str = 'Session',
             index_params: Optional[dict] = None,
             search_params: Optional[dict] = None,
             drop_old: bool = False,
@@ -355,7 +354,7 @@ class MilvusWithPermissionCheck(MilvusLangchain):
         output_fields = self.fields[:]
         output_fields.remove(self._vector_field)
 
-        finally_k = kwargs.pop("k", k)
+        finally_k = kwargs.pop('k', k)
 
         ret = []
 
@@ -494,7 +493,7 @@ class ElasticsearchWithPermissionCheck(VectorStore, ABC):
                 ))
             logger.debug(f'ElasticsearchWithPermissionCheck Search {one_index_name} results: {hits}')
         logger.debug(f'ElasticsearchWithPermissionCheck Search all results: {len(ret)}')
-        finally_k = kwargs.pop("finally_k", k)
+        finally_k = kwargs.pop('finally_k', k)
         ret.sort(key=lambda x: x[1], reverse=True)
         ret = ret[:finally_k]
         logger.debug(f'ElasticsearchWithPermissionCheck Search finally results: {len(ret)}')

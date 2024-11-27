@@ -1,6 +1,5 @@
-from fastapi import FastAPI
-
 from bisheng.restructure.routers import router as router_restructure
+from fastapi import FastAPI
 
 
 def register_restructure(app: FastAPI):
